@@ -1,26 +1,33 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Reset dasar */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+/* Warna dasar pakai CSS biasa (bukan @apply) */
+body {
+  background-color: #FAFAF8;  /* bg utama light */
+  color: #1E1E1E;             /* text utama light */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+}
+
+/* Dark mode: next-themes pakai class "dark" di <html> */
+html.dark body {
+  background-color: #1C1C1A;  /* bg utama dark */
+  color: #F3F3E8;             /* text utama dark */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+::selection {
+  background-color: #F2C94C; /* kuning telur */
+  color: #1E1E1E;
 }
