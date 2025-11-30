@@ -2,24 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Reset dasar */
+/* Setelah ini baru CSS custom kamu */
 html,
 body {
   padding: 0;
   margin: 0;
 }
 
-/* Warna dasar pakai CSS biasa (bukan @apply) */
 body {
-  background-color: #FAFAF8;  /* bg utama light */
-  color: #1E1E1E;             /* text utama light */
+  background-color: #FAFAF8;
+  color: #1E1E1E;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
 }
 
-/* Dark mode: next-themes pakai class "dark" di <html> */
 html.dark body {
-  background-color: #1C1C1A;  /* bg utama dark */
-  color: #F3F3E8;             /* text utama dark */
+  background-color: #1C1C1A;
+  color: #F3F3E8;
 }
 
 a {
@@ -28,6 +26,6 @@ a {
 }
 
 ::selection {
-  background-color: #F2C94C; /* kuning telur */
+  background-color: #F2C94C;
   color: #1E1E1E;
 }

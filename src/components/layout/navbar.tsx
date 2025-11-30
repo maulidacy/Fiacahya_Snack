@@ -6,11 +6,13 @@ import { useState } from 'react';
 import { ThemeToggle } from './theme-toggle';
 
 const navItems = [
-  { href: '/', label: 'Home' },
-  { href: '/produksi', label: 'Produksi' },
-  { href: '/qc', label: 'QC' },
-  { href: '/galeri', label: 'Galeri' },
-  { href: '/dokumentasi', label: 'Dokumentasi' },
+  { href: "/", label: "Home" },
+  { href: "/produk", label: "Produk" },
+  { href: "/produksi", label: "Produksi" },
+  { href: "/qc", label: "QC" },
+  { href: "/galeri", label: "Galeri" },
+  { href: "/dokumentasi", label: "Dokumentasi" },
+  { href: "/profil", label: "Profil & Kontak" },
 ];
 
 export function Navbar() {
