@@ -1,27 +1,58 @@
-'use client';
+// src/components/layout/theme-toggle.tsx
+"use client";
 
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return null;
+  // cegah mismatch SSR/client
+  if (!mounted) {
+    return (
+      <button
+        aria-label="Toggle theme"
+        className="inline-flex items-center gap-2 rounded-full bg-black/5 px-2 py-1 text-xs text-[#6A4A35] dark:bg-white/5 dark:text-neutral-200"
+      >
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-black/10 dark:bg-white/10" />
+        <span className="pr-1 text-[11px]">Theme</span>
+      </button>
+    );
+  }
 
-  const isDark = theme === 'dark';
+  const current = theme === "system" ? systemTheme : theme;
+  const isDark = current === "dark";
 
   return (
     <button
       type="button"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label="Toggle tema"
-      className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-text-light shadow-sm transition hover:bg-gray-100 dark:border-border-soft-dark dark:text-text-dark dark:hover:bg-neutral-800"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label="Toggle dark / light mode"
+      className="
+        inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium
+        bg-black/5 text-[#6A4A35]
+        hover:bg-black/10
+        dark:bg-white/5 dark:text-neutral-100 dark:hover:bg-white/10
+        transition-all hover:-translate-y-0.5 hover:shadow-soft
+      "
     >
-      <span className="h-4 w-4 rounded-full border border-gray-400 bg-white dark:border-border-soft-dark dark:bg-bg-dark" />
-      <span>{isDark ? 'Mode Gelap' : 'Mode Terang'}</span>
+      {/* icon bulat seperti sebelumnya */}
+      <span
+        className="
+          flex h-6 w-6 items-center justify-center rounded-full
+          bg-gradient-to-tr from-[#C48A4A] to-[#F4C58A]
+          text-[11px] text-white shadow-md
+          dark:from-neutral-100 dark:to-neutral-300 dark:text-neutral-900
+        "
+      >
+        {isDark ? "☾" : "☼"}
+      </span>
+      <span className="pr-1 text-[11px] tracking-wide">
+        {isDark ? "Dark" : "Light"}
+      </span>
     </button>
   );
 }

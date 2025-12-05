@@ -1,8 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* src/app/globals.css */
 
-/* Setelah ini baru CSS custom kamu */
+/* 1. PANGGIL CONFIG TAILWIND DI PALING ATAS  */
+/* kalau tailwind.config.ts di root:
+   - globals.css di src/app  → "../../tailwind.config.ts"
+   - globals.css di src      → "../tailwind.config.ts"  */
+@config "../../tailwind.config.ts";
+
+/* 2. Import Tailwind v4 */
+@import "tailwindcss";
+
+/* ===== CSS custom ===== */
+
 html,
 body {
   padding: 0;
@@ -12,12 +20,7 @@ body {
 body {
   background-color: #FAFAF8;
   color: #1E1E1E;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-}
-
-html.dark body {
-  background-color: #1C1C1A;
-  color: #F3F3E8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
 a {
@@ -28,4 +31,16 @@ a {
 ::selection {
   background-color: #F2C94C;
   color: #1E1E1E;
+}
+
+/* Light mode default */
+html:not(.dark) body {
+  background-color: #FAFAF8;
+  color: #1E1E1E;
+}
+
+/* Dark mode */
+html.dark body {
+  background-color: #1C1C1A;
+  color: #F3F3E8;
 }
