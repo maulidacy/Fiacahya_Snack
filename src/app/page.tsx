@@ -1,11 +1,27 @@
-// src/app/page.tsx
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ReactNode,
+  type ElementType,
+} from "react";
 import { Playfair_Display, Montserrat } from "next/font/google";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+
+import {
+  Flame,
+  ShieldCheck,
+  Gift,
+  ClipboardList,
+  FileText,
+  Clock3,
+  Star,
+} from "lucide-react";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -51,9 +67,10 @@ export default function HomePage() {
 
   // auto-slide testimonial carousel
   useEffect(() => {
-    const id = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 6000);
+    const id = setInterval(
+      () => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length),
+      6000
+    );
     return () => clearInterval(id);
   }, []);
 
@@ -68,8 +85,9 @@ export default function HomePage() {
   return (
     <main
       className={`${montserrat.variable} ${playfair.variable} font-sans 
-      bg-gradient-to-b from-[#FFF6EA] via-[#FFF3E2] to-[#FCE6D2] text-[#3E2A20]
-      dark:bg-gradient-to-b dark:from-[#0F0B08] dark:via-[#15100C] dark:to-[#1B130E] dark:text-neutral-50`}
+    min-h-screen
+    bg-bg-light text-text-light
+    dark:bg-bg-dark dark:text-text-dark`}
     >
       <Navbar />
 
@@ -127,8 +145,7 @@ export default function HomePage() {
                 className="group inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#C48A4A] to-[#F4C58A] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#C48A4A]/30 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
               >
                 <span className="mr-1">Order Sekarang</span>
-                <span className="inline-block transition-transform group-hover:translate-x-0.5">
-                </span>
+                <span className="inline-block transition-transform group-hover:translate-x-0.5" />
               </a>
 
               <a
@@ -182,17 +199,17 @@ export default function HomePage() {
             className="grid gap-6 md:grid-cols-3"
           >
             <AboutItem
-              icon="🥐"
+              icon={<Flame className="h-5 w-5 text-white" />}
               title="Freshly Baked"
               text="Semua kue dan snack diproduksi harian dengan jadwal baking terukur, bukan stok lama."
             />
             <AboutItem
-              icon="🧴"
+              icon={<ShieldCheck className="h-5 w-5 text-white" />}
               title="Higienis & Terukur"
               text="Proses produksi mengikuti SOP higienitas, pencatatan batch, dan quality control."
             />
             <AboutItem
-              icon="🎁"
+              icon={<Gift className="h-5 w-5 text-white" />}
               title="Packaging Premium"
               text="Box elegan, label rapi, siap untuk acara formal, corporate, dan hampers eksklusif."
             />
@@ -277,22 +294,22 @@ export default function HomePage() {
             className="grid gap-6 md:grid-cols-4"
           >
             <FeatureCard
-              icon="📋"
+              icon={<ClipboardList className="h-5 w-5" />}
               title="Terencana"
               text="Jadwal produksi jelas, cocok untuk order rutin kantor & kafe."
             />
             <FeatureCard
-              icon="🧾"
+              icon={<FileText className="h-5 w-5" />}
               title="Transparan"
               text="Detail ingredients dan informasi alergi yang rapi dan terbuka."
             />
             <FeatureCard
-              icon="⏰"
+              icon={<Clock3 className="h-5 w-5" />}
               title="On-Time"
               text="Tim delivery terlatih memastikan pesanan sampai tepat waktu."
             />
             <FeatureCard
-              icon="⭐"
+              icon={<Star className="h-5 w-5" />}
               title="Premium Taste"
               text="Rasa konsisten, tekstur seimbang, dan tampilan Instagramable."
             />
@@ -331,7 +348,7 @@ export default function HomePage() {
             />
             <OrderStep
               step="03"
-              title="Produksi & QC"
+              title="Produksi"
               text="Tim dapur memproduksi sesuai batch plan, dengan kontrol kualitas dan dokumentasi."
             />
             <OrderStep
@@ -343,19 +360,29 @@ export default function HomePage() {
 
           <motion.div
             variants={fadeUp}
-            className="mt-8 rounded-2xl bg-white/70 backdrop-blur border border-[#E1C09A]/70 px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm dark:bg-neutral-900/80 dark:border-neutral-700"
+            className="mt-8 rounded-2xl bg-white/70 backdrop-blur border border-[#E1C09A]/70 px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm dark:bg-neutral-900/80 dark:border-neutral-700"
           >
-            <p className="text-xs md:text-sm text-[#6A4A35] dark:text-neutral-200">
+            <p className="text-xs md:text-sm text-[#3A261A] dark:text-neutral-200">
               Untuk order cepat, hubungi kami via WhatsApp dan dapatkan
               rekomendasi paket dalam hitungan menit.
             </p>
+
             <a
               href="https://wa.me/6281234567890"
-              className="inline-flex items-center justify-center rounded-full bg-[#3E2A20] text-white text-xs font-semibold px-4 py-2 shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-transform dark:bg-neutral-100 dark:text-neutral-900"
+              className="
+      inline-flex items-center justify-center
+      rounded-full px-6 py-2.5 text-xs font-semibold
+      bg-[#3E2A20] text-white
+      shadow-[0_12px_30px_rgba(0,0,0,0.20)]
+      hover:-translate-y-0.5 active:translate-y-0
+      transition-transform
+      dark:bg-[#3E2A20] dark:text-white
+    "
             >
               Chat via WhatsApp
             </a>
           </motion.div>
+
         </div>
       </SectionWrapper>
 
@@ -406,11 +433,10 @@ export default function HomePage() {
                 <button
                   key={idx}
                   onClick={() => setCurrentTestimonial(idx)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    currentTestimonial === idx
+                  className={`h-1.5 rounded-full transition-all ${currentTestimonial === idx
                       ? "w-6 bg-[#F7D3A5]"
                       : "w-2 bg-[#F7D3A5]/40 hover:bg-[#F7D3A5]/70"
-                  }`}
+                    }`}
                   aria-label={`Lihat testimonial ${idx + 1}`}
                 />
               ))}
@@ -424,10 +450,7 @@ export default function HomePage() {
       ========================== */}
       <SectionWrapper>
         <div className="max-w-6xl mx-auto px-4 pb-10">
-          <motion.div
-            variants={fadeUp}
-            className="rounded-2xl bg-white/70 backdrop-blur border border-[#E1C09A]/70 px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm dark:bg-neutral-900/80 dark:border-neutral-700"
-          >
+          <div className="rounded-2xl bg-white/70 backdrop-blur border border-[#E1C09A]/70 px-6 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm dark:bg-neutral-900/80 dark:border-neutral-700">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#B47A45] mb-1 dark:text-amber-200">
                 Fiacahya Assistant (Ops Internal)
@@ -443,58 +466,12 @@ export default function HomePage() {
             >
               Buka Asisten Produksi
             </button>
-          </motion.div>
+          </div>
         </div>
       </SectionWrapper>
 
-      {/* =========================
-          FOOTER
-      ========================== */}
-      <SectionWrapper as="footer">
-        <div className="max-w-6xl mx-auto px-4 pb-10">
-          <motion.div
-            variants={fadeUp}
-            className="rounded-3xl bg-[#3A261A] text-[#FDE8D5] px-6 py-8 md:px-8 md:py-9 shadow-lg dark:bg-neutral-950 dark:text-neutral-100"
-          >
-            <div className="flex flex-col md:flex-row gap-6 md:gap-8 justify-between">
-              <div>
-                <h3 className="font-serif text-xl md:text-2xl mb-2">
-                  Fiacahya Snack
-                </h3>
-                <p className="text-xs md:text-sm text-[#F9D8AC] max-w-sm dark:text-neutral-300">
-                  Premium bakery & snack production untuk kebutuhan harian dan
-                  acara spesial Anda.
-                </p>
-              </div>
-
-              <div className="flex gap-10 text-xs">
-                <div className="space-y-1">
-                  <p className="font-semibold text-[#FDE8D5] dark:text-neutral-50">
-                    Kontak
-                  </p>
-                  <p>WhatsApp: 0812-3456-7890</p>
-                  <p>Email: hello@fiacahya-snack.com</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-semibold text-[#FDE8D5] dark:text-neutral-50">
-                    Alamat Produksi
-                  </p>
-                  <p>Fiacahya Kitchen Lab</p>
-                  <p>Jakarta, Indonesia</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 border-t border-[#6A4A35] pt-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[11px] text-[#F9D8AC]/85 dark:border-neutral-800 dark:text-neutral-400">
-              <p>
-                © {new Date().getFullYear()} Fiacahya Snack. All rights
-                reserved.
-              </p>
-              <p>Homemade with care · Delivered with precision.</p>
-            </div>
-          </motion.div>
-        </div>
-      </SectionWrapper>
+      {/* FOOTER BARU */}
+      <Footer />
     </main>
   );
 }
@@ -508,9 +485,9 @@ function SectionWrapper({
   id,
   as: As = "section",
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   id?: string;
-  as?: React.ElementType;
+  as?: ElementType;
 }) {
   return (
     <As id={id} className="bg-transparent">
@@ -526,7 +503,7 @@ function SectionWrapper({
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children }: { children: ReactNode }) {
   return (
     <p className="text-[11px] uppercase tracking-[0.2em] text-[#B47A45] mb-1 dark:text-amber-200">
       {children}
@@ -534,7 +511,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <h2 className="font-serif text-2xl md:text-3xl lg:text-3xl text-[#3A261A] mb-2 dark:text-neutral-50">
       {children}
@@ -542,7 +519,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SectionText({ children }: { children: React.ReactNode }) {
+function SectionText({ children }: { children: ReactNode }) {
   return (
     <p className="text-sm md:text-base text-[#6A4A35] leading-relaxed dark:text-neutral-200">
       {children}
@@ -553,8 +530,8 @@ function SectionText({ children }: { children: React.ReactNode }) {
 function HeroStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="h-7 w-7 rounded-full bg-white/70 backdrop-blur border border-[#E3C9A8] flex items-center justify-center text-[11px] font-semibold text-[#B47A45] shadow-[0_8px_24px_rgba(0,0,0,0.04)] dark:bg-neutral-900/80 dark:border-neutral-700 dark:text-amber-200">
-        ✦
+      <div className="h-7 w-7 rounded-full bg-white/70 backdrop-blur border border-[#E3C9A8] flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.04)] dark:bg-neutral-900/80 dark:border-neutral-700">
+        <Star className="h-3.5 w-3.5 text-[#B47A45] dark:text-amber-200" />
       </div>
       <div className="flex flex-col leading-tight">
         <span className="text-xs font-semibold text-[#3A261A] dark:text-neutral-50">
@@ -573,24 +550,45 @@ function AboutItem({
   title,
   text,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   text: string;
 }) {
   return (
     <motion.div
       variants={fadeUp}
-      className="group rounded-2xl bg-white/70 backdrop-blur border border-[#E1C09A]/70 px-4 py-5 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:bg-white/90 transition-all duration-200 dark:bg-neutral-900/80 dark:border-neutral-700 dark:hover:bg-neutral-800"
+      className="
+        group rounded-3xl
+        bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]
+        border border-[#E1C09A]/70
+        px-5 py-6
+        hover:-translate-y-1.5 hover:shadow-[0_26px_80px_rgba(15,23,42,0.16)]
+        hover:border-[#C48A4A]
+        transition-all duration-200
+        dark:bg-[#0C0C0C]
+        dark:border-neutral-800
+        dark:hover:border-amber-300/80
+        dark:shadow-[0_20px_60px_rgba(0,0,0,0.75)]
+      "
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-[#C48A4A] to-[#F4C58A] flex items-center justify-center text-lg shadow-md group-hover:scale-110 transition-transform">
+        <div
+          className="
+            h-10 w-10 rounded-2xl
+            bg-gradient-to-tr from-[#C48A4A] via-[#E7B57B] to-[#F4C58A]
+            flex items-center justify-center
+            shadow-[0_12px_30px_rgba(196,138,74,0.55)]
+            group-hover:scale-110 group-hover:rotate-1
+            transition-transform
+          "
+        >
           {icon}
         </div>
-        <p className="text-sm font-semibold text-[#3A261A] dark:text-neutral-50">
+        <p className="text-sm font-semibold text-[#2D2117] dark:text-neutral-50">
           {title}
         </p>
       </div>
-      <p className="text-xs text-[#6A4A35] leading-relaxed dark:text-neutral-200">
+      <p className="text-xs text-[#6A4A35] leading-relaxed dark:text-neutral-300">
         {text}
       </p>
     </motion.div>
@@ -613,9 +611,23 @@ function ProductCard({
   return (
     <motion.article
       variants={fadeUp}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ y: -10, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 230, damping: 20 }}
-      className="group rounded-3xl bg-white/80 backdrop-blur border border-[#E1C09A]/70 overflow-hidden shadow-[0_14px_45px_rgba(0,0,0,0.06)] dark:bg-neutral-900/80 dark:border-neutral-700"
+      className="
+        group rounded-3xl overflow-hidden
+        bg-white
+        border border-[#E1C09A]/80
+        shadow-[0_18px_60px_rgba(15,23,42,0.08)]
+        hover:shadow-[0_26px_90px_rgba(15,23,42,0.16)]
+        hover:border-[#C48A4A]
+        hover:ring-1 hover:ring-[#F4C58A]/70
+        transition-all duration-200
+        dark:bg-[#050505]
+        dark:border-neutral-800
+        dark:hover:border-amber-300/80
+        dark:hover:ring-amber-200/40
+        dark:shadow-[0_22px_70px_rgba(0,0,0,0.9)]
+      "
     >
       <div className="relative h-40 sm:h-44">
         <Image
@@ -623,21 +635,21 @@ function ProductCard({
           alt={title}
           fill
           sizes="(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
-        <div className="absolute left-3 bottom-3 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-[#8C6647] shadow-sm dark:bg-neutral-950/90 dark:text-neutral-100">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent" />
+        <div className="absolute left-3 bottom-3 inline-flex items-center rounded-full bg-white/95 px-3 py-1 text-[11px] font-semibold text-[#8C6647] shadow-sm dark:bg-neutral-950/95 dark:text-neutral-100">
           {tag}
         </div>
       </div>
       <div className="px-4 py-4">
-        <h3 className="text-sm font-semibold text-[#3A261A] mb-1 dark:text-neutral-50">
+        <h3 className="text-sm font-semibold text-[#2D2117] mb-1 dark:text-neutral-50">
           {title}
         </h3>
-        <p className="text-xs text-[#6A4A35] leading-relaxed mb-2 dark:text-neutral-200">
+        <p className="text-xs text-[#6A4A35] leading-relaxed mb-2 dark:text-neutral-300">
           {desc}
         </p>
-        <p className="text-xs font-semibold text-[#B47A45] dark:text-amber-200">
+        <p className="text-xs font-semibold text-[#C48A4A] dark:text-amber-200">
           {price}
         </p>
       </div>
@@ -650,26 +662,40 @@ function FeatureCard({
   title,
   text,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   text: string;
 }) {
   return (
     <motion.div
       variants={fadeUp}
-      whileHover={{ scale: 1.04 }}
+      whileHover={{ scale: 1.05, translateY: -4 }}
       transition={{ type: "spring", stiffness: 260, damping: 18 }}
-      className="rounded-2xl bg-white/75 backdrop-blur border border-[#E1C09A]/70 px-4 py-5 shadow-sm text-xs dark:bg-neutral-900/80 dark:border-neutral-700"
+      className="
+        rounded-2xl
+        bg-white
+        border border-[#E1C09A]/80
+        shadow-[0_16px_55px_rgba(15,23,42,0.08)]
+        px-4 py-5 text-xs
+        hover:border-[#C48A4A] hover:ring-1 hover:ring-[#F4C58A]/70
+        hover:shadow-[0_24px_80px_rgba(15,23,42,0.16)]
+        transition-all duration-200
+        dark:bg-[#050505]
+        dark:border-neutral-800
+        dark:hover:border-amber-300/80
+        dark:hover:ring-amber-200/40
+        dark:shadow-[0_22px_70px_rgba(0,0,0,0.85)]
+      "
     >
       <div className="mb-3">
-        <div className="inline-flex items-center justify-center rounded-2xl bg-[#FFF1DD] text-lg px-2 py-1 shadow-[0_10px_30px_rgba(0,0,0,0.04)] dark:bg-neutral-800">
+        <div className="inline-flex items-center justify-center rounded-2xl bg-[#FFF1DD] px-2 py-1 shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:bg-neutral-800">
           {icon}
         </div>
       </div>
-      <p className="font-semibold text-[#3A261A] mb-1 dark:text-neutral-50">
+      <p className="font-semibold text-[#2D2117] mb-1 dark:text-neutral-50">
         {title}
       </p>
-      <p className="text-[#6A4A35] leading-relaxed dark:text-neutral-200">
+      <p className="text-[#6A4A35] leading-relaxed dark:text-neutral-300">
         {text}
       </p>
     </motion.div>
@@ -686,16 +712,38 @@ function OrderStep({
   text: string;
 }) {
   return (
-    <motion.li variants={fadeUp} className="relative pl-6">
-      <div className="absolute -left-3 top-1.5 h-5 w-5 rounded-full bg-gradient-to-tr from-[#C48A4A] to-[#F4C58A] flex items-center justify-center text-[10px] font-semibold text-white shadow-md">
+    <motion.li
+      variants={fadeUp}
+      className="relative pl-6"
+    >
+      {/* dot nomor di garis */}
+      <div className="absolute -left-3 top-4 h-5 w-5 rounded-full bg-gradient-to-tr from-[#C48A4A] to-[#F4C58A] flex items-center justify-center text-[10px] font-semibold text-white shadow-md">
         {step}
       </div>
-      <h3 className="text-sm font-semibold text-[#3A261A] mb-1 dark:text-neutral-50">
-        {title}
-      </h3>
-      <p className="text-xs text-[#6A4A35] leading-relaxed dark:text-neutral-200">
-        {text}
-      </p>
+
+      {/* card konten step */}
+      <div
+        className="
+          rounded-2xl bg-white/95
+          border border-[#E1C09A]/70
+          px-4 py-3
+          shadow-[0_14px_45px_rgba(15,23,42,0.06)]
+          hover:shadow-[0_20px_70px_rgba(15,23,42,0.12)]
+          hover:border-[#C48A4A]
+          transition-all duration-200
+          dark:bg-[#050505]
+          dark:border-neutral-800
+          dark:hover:border-amber-300/80
+          dark:shadow-[0_20px_60px_rgba(0,0,0,0.85)]
+        "
+      >
+        <h3 className="text-sm font-semibold text-[#2D2117] mb-1 dark:text-neutral-50">
+          {title}
+        </h3>
+        <p className="text-xs text-[#6A4A35] leading-relaxed dark:text-neutral-300">
+          {text}
+        </p>
+      </div>
     </motion.li>
   );
 }

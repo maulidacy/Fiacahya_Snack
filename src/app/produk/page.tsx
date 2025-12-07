@@ -50,20 +50,14 @@ const categories = [
     examples: ["Snack box isi 3–5 item", "Paket arisan", "Paket rapat pagi"],
     note: "Layout box rapi, label jelas, dan dokumentasi batch tersedia.",
   },
-  {
-    title: "Jajanan Pasar",
-    desc: "Ragam jajanan tradisional dengan standar produksi modern dan higienis.",
-    examples: ["Lapis beras", "Kue talam", "Getuk", "Serabi"],
-    note: "Pas untuk acara bertema tradisional atau kantin karyawan.",
-  },
 ];
 
 export default function ProdukPage() {
   return (
     <main
       className={`${montserrat.variable} ${playfair.variable} font-sans
-        bg-gradient-to-b from-[#FFF6EA] via-[#FFF3E2] to-[#FCE6D2] text-[#3A261A]
-        dark:bg-gradient-to-b dark:from-[#050403] dark:via-[#090706] dark:to-[#120C08] dark:text-neutral-50`}
+        min-h-screen bg-bg-light text-text-light
+        dark:bg-bg-dark dark:text-text-dark`}
     >
       <Navbar />
 

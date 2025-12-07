@@ -1,10 +1,20 @@
-// src/app/%28site%29/produksi/page.tsx
+// src/app/(site)/produksi/page.tsx
 "use client";
 
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Playfair_Display, Montserrat } from "next/font/google";
 import { motion } from "framer-motion";
+import type { LucideIcon } from "lucide-react";
+import {
+  ClipboardList,
+  Timer,
+  Flame,
+  Snowflake,
+  Package,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-sans" });
@@ -25,37 +35,99 @@ const stagger = {
   },
 };
 
+type ProductionStepItem = {
+  step: string;
+  title: string;
+  text: string;
+  Icon: LucideIcon;
+};
+
+const productionSteps: ProductionStepItem[] = [
+  {
+    step: "01",
+    title: "Persiapan & Penimbangan",
+    text: "Bahan baku disiapkan dan ditimbang sesuai resep & batch plan. Bahan yang sudah dibuka dicatat tanggal dan jamnya.",
+    Icon: ClipboardList,
+  },
+  {
+    step: "02",
+    title: "Mixing & Pengolahan Adonan",
+    text: "Adonan di-mixing dengan waktu dan speed terukur, menyesuaikan jenis kue (basah, kering, atau cake).",
+    Icon: Timer,
+  },
+  {
+    step: "03",
+    title: "Proses Panas: Kukus / Panggang",
+    text: "Tray dimasukkan ke steamer atau oven dengan suhu dan durasi yang sudah distandarkan per produk.",
+    Icon: Flame,
+  },
+  {
+    step: "04",
+    title: "Cooling & QC Visual",
+    text: "Produk didinginkan di rak khusus. Tekstur, warna, dan bentuk dicek sebelum boleh masuk area packing.",
+    Icon: Snowflake,
+  },
+  {
+    step: "05",
+    title: "Packing & Label Batch",
+    text: "Produk dikemas, diberi label batch, tanggal produksi, dan informasi untuk kebutuhan traceability.",
+    Icon: Package,
+  },
+];
+
 export default function ProduksiPage() {
   return (
     <main
       className={`${montserrat.variable} ${playfair.variable} font-sans
-        bg-gradient-to-b from-[#FFF6EA] via-[#FFF3E2] to-[#FCE6D2] text-[#3A261A]
-        dark:bg-gradient-to-b dark:from-[#050403] dark:via-[#090706] dark:to-[#120C08] dark:text-neutral-50`}
+        min-h-screen bg-bg-light text-text-light
+        dark:bg-bg-dark dark:text-text-dark`}
     >
       <Navbar />
 
-      {/* HERO – gambaran singkat produksi */}
-      <section className="bg-transparent">
-        <div className="max-w-6xl mx-auto px-4 pt-10 pb-6 md:pt-14 md:pb-10">
+      {/* ALUR PRODUKSI – TIMELINE DI TENGAH */}
+      <section className="bg-transparent pb-8 md:pb-12">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div
             variants={fadeUp}
             initial="hidden"
-            animate="visible"
-            className="max-w-3xl"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            className="max-w-3xl mx-auto mb-6 text-center"
           >
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[#B47A45] mb-2 dark:text-amber-200/90">
-              Production Story
-            </p>
-            <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl mb-3 text-[#3A261A] dark:text-neutral-50">
-              Di balik setiap kotak snack, ada alur produksi yang terencana.
-            </h1>
-            <p className="text-sm md:text-base text-[#6A4A35] dark:text-neutral-200 leading-relaxed">
-              Tim produksi Fiacahya Snack bekerja dalam jadwal baking harian yang
-              terukur, dengan fokus pada tekstur kue yang stabil, higienitas dapur,
-              dan dokumentasi batch yang rapi. Halaman ini merangkum bagaimana
-              proses tersebut berjalan setiap hari.
-            </p>
+            <SectionLabel>Alur Produksi Harian</SectionLabel>
+            <SectionTitle>Setiap batch melewati langkah yang sama.</SectionTitle>
+            <SectionText>
+              Mulai dari penimbangan bahan hingga pengecekan akhir sebelum packing,
+              setiap tahapan memiliki checklist tersendiri untuk menjaga konsistensi
+              rasa dan penampilan produk.
+            </SectionText>
           </motion.div>
+
+          <motion.ol
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            className="relative max-w-5xl mx-auto space-y-8 md:space-y-10"
+          >
+            {/* GARIS VERTIKAL DI TENGAH */}
+            <div
+              className="
+                pointer-events-none
+                absolute left-1/2 top-0 bottom-0 -translate-x-1/2
+                w-px bg-border-soft dark:bg-border-soft-dark
+              "
+            />
+
+            {productionSteps.map((item, idx) => (
+              <ProductionStep
+                key={item.step}
+                {...item}
+                // step 1 (idx 0) di KANAN, lalu kiri, lalu kanan, dst
+                align={idx % 2 === 0 ? "right" : "left"}
+              />
+            ))}
+          </motion.ol>
         </div>
       </section>
 
@@ -92,60 +164,6 @@ export default function ProduksiPage() {
         </div>
       </section>
 
-      {/* ALUR PRODUKSI – langkah ringkas */}
-      <section className="bg-transparent pb-8 md:pb-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.25 }} className="max-w-3xl mb-6">
-            <SectionLabel>Alur Produksi Harian</SectionLabel>
-            <SectionTitle>Setiap batch melewati langkah yang sama.</SectionTitle>
-            <SectionText>
-              Mulai dari penimbangan bahan hingga pengecekan akhir sebelum packing,
-              setiap tahapan memiliki checklist tersendiri untuk menjaga konsistensi
-              rasa dan penampilan produk.
-            </SectionText>
-          </motion.div>
-
-          <motion.ol
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.25 }}
-            className="space-y-5 md:space-y-6"
-          >
-            <ProductionStep
-              step="01"
-              title="Persiapan & Penimbangan"
-              icon="⚖️"
-              text="Bahan baku disiapkan dan ditimbang sesuai resep & batch plan. Bahan yang sudah dibuka dicatat tanggal dan jamnya."
-            />
-            <ProductionStep
-              step="02"
-              title="Mixing & Pengolahan Adonan"
-              icon="🥣"
-              text="Adonan di-mixing dengan waktu dan speed terukur, menyesuaikan jenis kue (basah, kering, atau cake)."
-            />
-            <ProductionStep
-              step="03"
-              title="Proses Panas: Kukus / Panggang"
-              icon="🔥"
-              text="Tray dimasukkan ke steamer atau oven dengan suhu dan durasi yang sudah distandarkan per produk."
-            />
-            <ProductionStep
-              step="04"
-              title="Cooling & QC Visual"
-              icon="❄️"
-              text="Produk didinginkan di rak khusus. Tekstur, warna, dan bentuk dicek sebelum boleh masuk area packing."
-            />
-            <ProductionStep
-              step="05"
-              title="Packing & Label Batch"
-              icon="📦"
-              text="Produk dikemas, diberi label batch, tanggal produksi, dan informasi untuk kebutuhan traceability."
-            />
-          </motion.ol>
-        </div>
-      </section>
-
       {/* QC & HIGIENITAS */}
       <section className="bg-transparent pb-8 md:pb-12">
         <div className="max-w-6xl mx-auto px-4">
@@ -174,18 +192,18 @@ export default function ProduksiPage() {
           >
             <InfoCard
               title="Checklist Harian"
-              icon="📋"
               text="Pencatatan suhu chiller, kondisi dapur, dan kebersihan alat dilakukan sebelum dan setelah produksi."
+              Icon={ClipboardList}
             />
             <InfoCard
               title="Personal Hygiene"
-              icon="🧤"
               text="Tim menggunakan apron, hairnet, dan sarung tangan sesuai area kerja. Training berkala untuk SOP dasar."
+              Icon={ShieldCheck}
             />
             <InfoCard
               title="Sampling QC"
-              icon="🔍"
               text="Beberapa sample dari tiap batch dicek tekstur, rasa, dan tampilan sebelum dikemas atau dikirim."
+              Icon={Search}
             />
           </motion.div>
         </div>
@@ -199,8 +217,8 @@ export default function ProduksiPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
-            className="rounded-3xl border border-[#E3C9A8]/80 bg-white/80 px-5 py-5 md:px-6 md:py-6 shadow-soft
-              dark:border-neutral-800 dark:bg-[#111111]/95"
+            className="rounded-3xl border border-border-soft bg-white/80 px-5 py-5 md:px-6 md:py-6 shadow-soft
+              dark:border-border-soft-dark dark:bg-[#111111]/95"
           >
             <div className="flex flex-col md:flex-row gap-5 md:gap-8 justify-between">
               <div className="max-w-xl">
@@ -274,8 +292,8 @@ function HighlightCard({
   return (
     <motion.div
       variants={fadeUp}
-      className="rounded-2xl border border-[#E3C9A8] bg-white/90 px-4 py-4 shadow-soft
-        dark:border-neutral-800 dark:bg-[#111111]/95"
+      className="rounded-2xl border border-border-soft bg-white/90 px-4 py-4 shadow-soft
+        dark:border-border-soft-dark dark:bg-[#111111]/95"
     >
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#B47A45] mb-1 dark:text-amber-200/90">
         {label}
@@ -289,58 +307,91 @@ function HighlightCard({
 }
 
 function ProductionStep({
-  step,
+  step, // tidak dipakai, tapi dibiarkan untuk konsistensi tipe
   title,
   text,
-  icon,
-}: {
-  step: string;
-  title: string;
-  text: string;
-  icon: string;
-}) {
+  Icon,
+  align, // "right" = card di kanan, "left" = card di kiri
+}: ProductionStepItem & { align: "left" | "right" }) {
+  const isRight = align === "right";
+
   return (
     <motion.li
       variants={fadeUp}
-      className="relative rounded-2xl border border-[#E3C9A8] bg-white/90 px-4 py-4 pl-5 shadow-soft
-        dark:border-neutral-800 dark:bg-[#111111]/95"
+      className="relative grid md:grid-cols-[1fr_auto_1fr] items-center gap-6 md:gap-10"
     >
-      <div className="absolute -left-3 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#C48A4A] to-[#F4C58A] text-[10px] font-semibold text-white shadow-md">
-        {step}
+      {/* KOLUM KIRI (card kalau align left) */}
+      <div className="hidden md:block">
+        {!isRight && <StepCard title={title} text={text} align="right" />}
       </div>
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 text-lg">{icon}</div>
-        <div>
-          <p className="text-sm font-semibold text-[#3A261A] dark:text-neutral-50">
-            {title}
-          </p>
-          <p className="mt-1 text-xs text-[#6A4A35] dark:text-neutral-200 leading-relaxed">
-            {text}
-          </p>
+
+      {/* NODE DI TENGAH: kotak icon di atas garis */}
+      <div className="flex items-center justify-center z-[1]">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border-soft bg-white shadow-soft dark:border-border-soft-dark dark:bg-[#15100C]">
+          <Icon className="h-5 w-5 text-[#B47A45] dark:text-amber-200" />
         </div>
       </div>
+
+      {/* KOLUM KANAN (card kalau align right) */}
+      <div className="hidden md:block">
+        {isRight && <StepCard title={title} text={text} align="left" />}
+      </div>
+
+      {/* MOBILE: card full width di bawah icon */}
+      <div className="md:hidden col-span-full mt-3">
+        <StepCard title={title} text={text} align="left" />
+      </div>
     </motion.li>
+  );
+}
+
+function StepCard({
+  title,
+  text,
+  align,
+}: {
+  title: string;
+  text: string;
+  align: "left" | "right";
+}) {
+  const textAlign = align === "right" ? "text-right" : "text-left";
+
+  return (
+    <div
+      className={`
+        max-w-md rounded-2xl border border-border-soft bg-white/90 px-4 py-3 shadow-soft
+        dark:border-border-soft-dark dark:bg-[#111111]/95
+        ${textAlign} mx-auto
+      `}
+    >
+      <p className="text-sm font-semibold text-[#3A261A] dark:text-neutral-50">
+        {title}
+      </p>
+      <p className="mt-1 text-xs text-[#6A4A35] dark:text-neutral-200 leading-relaxed">
+        {text}
+      </p>
+    </div>
   );
 }
 
 function InfoCard({
   title,
   text,
-  icon,
+  Icon,
 }: {
   title: string;
   text: string;
-  icon: string;
+  Icon: LucideIcon;
 }) {
   return (
     <motion.div
       variants={fadeUp}
-      className="rounded-2xl border border-[#E3C9A8] bg-white/90 px-4 py-4 shadow-soft text-xs
-        dark:border-neutral-800 dark:bg-[#111111]/95"
+      className="rounded-2xl border border-border-soft bg-white/90 px-4 py-4 shadow-soft text-xs
+        dark:border-border-soft-dark dark:bg-[#111111]/95"
     >
       <div className="mb-2 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-[#FFF1DD] text-lg shadow-sm dark:bg-[#272018]">
-          {icon}
+        <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-[#FFF1DD] shadow-sm dark:bg-[#272018]">
+          <Icon className="h-4 w-4 text-[#B47A45] dark:text-amber-200" />
         </div>
         <p className="font-semibold text-[#3A261A] dark:text-neutral-50">{title}</p>
       </div>

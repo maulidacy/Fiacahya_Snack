@@ -1,15 +1,12 @@
 /* src/app/globals.css */
 
-/* 1. PANGGIL CONFIG TAILWIND DI PALING ATAS  */
-/* kalau tailwind.config.ts di root:
-   - globals.css di src/app  → "../../tailwind.config.ts"
-   - globals.css di src      → "../tailwind.config.ts"  */
+/* 1. Hubungkan ke tailwind.config.ts */
 @config "../../tailwind.config.ts";
 
 /* 2. Import Tailwind v4 */
 @import "tailwindcss";
 
-/* ===== CSS custom ===== */
+/* ===== RESET & GLOBAL ===== */
 
 html,
 body {
@@ -18,8 +15,8 @@ body {
 }
 
 body {
-  background-color: #FAFAF8;
-  color: #1E1E1E;
+  background-color: #ffffff; /* light: putih */
+  color: #1f2933;            /* text neutral */
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
@@ -30,17 +27,17 @@ a {
 
 ::selection {
   background-color: #F2C94C;
-  color: #1E1E1E;
+  color: #111827;
 }
 
 /* Light mode default */
 html:not(.dark) body {
-  background-color: #FAFAF8;
-  color: #1E1E1E;
+  background-color: #ffffff;
+  color: #1f2933;
 }
 
 /* Dark mode */
 html.dark body {
-  background-color: #1C1C1A;
+  background-color: #050608; /* global dark */
   color: #F3F3E8;
 }

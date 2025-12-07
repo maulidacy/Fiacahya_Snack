@@ -3,6 +3,7 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { Sun, Moon } from "lucide-react";
 
 export function ThemeToggle() {
   const { theme, setTheme, systemTheme } = useTheme();
@@ -10,7 +11,6 @@ export function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  // cegah mismatch SSR/client
   if (!mounted) {
     return (
       <button
@@ -39,16 +39,19 @@ export function ThemeToggle() {
         transition-all hover:-translate-y-0.5 hover:shadow-soft
       "
     >
-      {/* icon bulat seperti sebelumnya */}
       <span
         className="
           flex h-6 w-6 items-center justify-center rounded-full
-          bg-gradient-to-tr from-[#C48A4A] to-[#F4C58A]
-          text-[11px] text-white shadow-md
+          bg-gradient-to-tr from-brand-caramel to-brand-gold
+          text-white shadow-md
           dark:from-neutral-100 dark:to-neutral-300 dark:text-neutral-900
         "
       >
-        {isDark ? "☾" : "☼"}
+        {isDark ? (
+          <Moon className="h-3.5 w-3.5" />
+        ) : (
+          <Sun className="h-3.5 w-3.5" />
+        )}
       </span>
       <span className="pr-1 text-[11px] tracking-wide">
         {isDark ? "Dark" : "Light"}

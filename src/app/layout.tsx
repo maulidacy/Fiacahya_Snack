@@ -15,7 +15,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* body boleh kamu kasih font, tapi jangan kasih bg tetap di sini */}
       <body>
         <ThemeProvider
           attribute="class"       // <html class="dark" />
