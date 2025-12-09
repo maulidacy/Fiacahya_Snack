@@ -7,7 +7,7 @@
 [![OpenAI](https://img.shields.io/badge/OpenAI-API-green)](https://openai.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> Website resmi Fiacahya Snack — Bakery rumahan yang menyediakan kue basah, kue kering, tart/cake, dan snack box untuk acara. Dibangun dengan teknologi modern untuk pengalaman pengguna yang premium.
+> Website resmi Fiacahya Snack - Bakery rumahan yang menyediakan kue basah, kue kering, tart/cake, dan snack box untuk acara. Dibangun dengan teknologi modern untuk pengalaman pengguna yang premium.
 
 ![Fiacahya Snack Preview](./public/preview.png) <!-- Placeholder for project screenshot -->
 
@@ -33,7 +33,7 @@ Fiacahya Snack adalah platform web produksi dan pemesanan untuk bakery rumahan y
 - **Language**: TypeScript
 - **Styling**: TailwindCSS v4
 - **Animations**: Framer Motion
-- **AI Integration**: OpenAI API (gpt-4o-mini)
+- **AI Integration**: OpenAI API (gpt-4.1-mini)
 - **Theme Management**: next-themes
 - **Icons**: Lucide React
 - **Build Tools**: ESLint, PostCSS, Autoprefixer
