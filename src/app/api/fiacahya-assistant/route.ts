@@ -76,15 +76,19 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ reply });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    // safe logging
     console.error("Fiacahya assistant error:", err);
 
-    // kalau error dari OpenAI SDK, kadang ada detail di err.error atau err.message
+    // ambil pesan error kalau memang instance Error
+    const message =
+      err instanceof Error ? err.message : "unknown error";
+
     return NextResponse.json(
       {
         error:
           "Maaf kak, asisten lagi ada kendala saat menghubungi server AI. Coba lagi sebentar, ya.",
-        detail: err?.message ?? "unknown error",
+        detail: message,
       },
       { status: 500 }
     );
