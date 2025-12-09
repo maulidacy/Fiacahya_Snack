@@ -2,11 +2,8 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  // optional: timeout bawaan, biar nggak ngegantung lama
-  timeout: 15000, // 15 detik
-});
+// pastikan pakai Node runtime (bukan edge)
+export const runtime = "nodejs";
 
 const FIACA_HARDCODED_CONTEXT = `
 Kamu adalah asisten produksi & pemesanan Fiacahya Snack.
@@ -27,9 +24,9 @@ Aturan penting:
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const userMessage: string = body.message;
+    const userMessage = (body?.message ?? "").toString().trim();
 
-    if (!userMessage || typeof userMessage !== "string") {
+    if (!userMessage) {
       return NextResponse.json(
         { error: "Pesan tidak valid." },
         { status: 400 }
@@ -47,19 +44,19 @@ export async function POST(req: Request) {
       );
     }
 
+    // INISIALISASI CLIENT DI DALAM HANDLER, BUKAN DI TOP-LEVEL
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      // optional: timeout untuk request (bukan untuk build)
+      timeout: 15000,
+    });
+
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content: FIACA_HARDCODED_CONTEXT,
-        },
-        {
-          role: "user",
-          content: userMessage,
-        },
+        { role: "system", content: FIACA_HARDCODED_CONTEXT },
+        { role: "user", content: userMessage },
       ],
-      // hemat token & jawaban pendek
       max_tokens: 220,
       temperature: 0.4,
     });
@@ -68,19 +65,14 @@ export async function POST(req: Request) {
 
     if (!reply) {
       return NextResponse.json(
-        {
-          error: "Jawaban dari model kosong.",
-        },
+        { error: "Jawaban dari model kosong." },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ reply });
   } catch (err: unknown) {
-    // safe logging
     console.error("Fiacahya assistant error:", err);
-
-    // ambil pesan error kalau memang instance Error
     const message =
       err instanceof Error ? err.message : "unknown error";
 
