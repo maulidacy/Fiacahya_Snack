@@ -9,8 +9,6 @@
 
 > Website resmi Fiacahya Snack - Bakery rumahan yang menyediakan kue basah, kue kering, tart/cake, dan snack box untuk acara. Dibangun dengan teknologi modern untuk pengalaman pengguna yang premium.
 
-![Fiacahya Snack Preview](./public/preview.png) <!-- Placeholder for project screenshot -->
-
 ## 📋 Deskripsi Proyek
 
 Fiacahya Snack adalah platform web produksi dan pemesanan untuk bakery rumahan yang berlokasi di Gubug, Grobogan. Website ini dirancang untuk memberikan pengalaman browsing yang menarik dengan UI premium, animasi halus, dan integrasi AI assistant untuk membantu pelanggan dalam proses pemesanan.
