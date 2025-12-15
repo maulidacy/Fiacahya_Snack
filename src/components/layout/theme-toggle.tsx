@@ -1,4 +1,3 @@
-// src/components/layout/theme-toggle.tsx
 "use client";
 
 import { useTheme } from "next-themes";
@@ -9,7 +8,10 @@ export function ThemeToggle() {
   const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   if (!mounted) {
     return (
@@ -47,11 +49,7 @@ export function ThemeToggle() {
           dark:from-neutral-100 dark:to-neutral-300 dark:text-neutral-900
         "
       >
-        {isDark ? (
-          <Moon className="h-3.5 w-3.5" />
-        ) : (
-          <Sun className="h-3.5 w-3.5" />
-        )}
+        {isDark ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
       </span>
       <span className="pr-1 text-[11px] tracking-wide">
         {isDark ? "Dark" : "Light"}

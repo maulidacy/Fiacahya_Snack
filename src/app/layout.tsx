@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body>
-        {/* kalau memang pakai ThemeProvider, bungkus di sini */}
+        {/* pakai ThemeProvider, bungkus di sini */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

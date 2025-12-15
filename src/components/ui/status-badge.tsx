@@ -1,3 +1,4 @@
+// src/components/ui/status-badge.tsx
 type BatchStatus = "done" | "in-progress" | "attention";
 
 const STATUS_CONFIG: Record<

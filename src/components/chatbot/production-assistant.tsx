@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Bot } from "lucide-react";
+import { Send, X, Sparkles } from "lucide-react";
 
 type ChatMessage = {
   id: number;
@@ -114,7 +114,7 @@ export function ProductionAssistant() {
         aria-label="Buka Asisten Produksi AI"
         onClick={() => setOpen(true)}
         className="
-          fixed bottom-5 right-4 z-40
+    fixed bottom-5 right-4 z-40
           inline-flex items-center justify-center
           h-12 w-12 md:h-[52px] md:w-[52px]
           rounded-full bg-[#3E2A20] text-white
@@ -123,10 +123,11 @@ export function ProductionAssistant() {
           transition-transform
           md:bottom-6 md:right-6
           dark:bg-[#F5E2C8] dark:text-[#3E2A20]
-        "
+  "
       >
-        <Bot className="h-5 w-5" />
+        <Sparkles className="h-5 w-5" />
       </button>
+
 
       {/* PANEL CHAT */}
       <AnimatePresence>
@@ -200,19 +201,17 @@ export function ProductionAssistant() {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                   >
                     <div
                       className={`
                         max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed
-                        ${
-                          msg.role === "user"
-                            ? // USER → coklat gelap
-                              "bg-[#3E2A20] text-white border border-[#2A170F] dark:bg-[#F5E2C8] dark:text-[#2A170F] dark:border-[#E3C9A8]"
-                            : // ASSISTANT → kuning krem
-                              "bg-[#FFF5EB] text-[#3A261A] border border-[#F2C89C]"
+                        ${msg.role === "user"
+                          ? // USER → coklat gelap
+                          "bg-[#3E2A20] text-white border border-[#2A170F] dark:bg-[#F5E2C8] dark:text-[#2A170F] dark:border-[#E3C9A8]"
+                          : // ASSISTANT → kuning krem
+                          "bg-[#FFF5EB] text-[#3A261A] border border-[#F2C89C]"
                         }
                       `}
                     >
