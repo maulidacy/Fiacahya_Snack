@@ -1,5 +1,4 @@
 // src/data/paket-snack.ts
-
 export type SnackCategorySlug =
   | "kue-basah"
   | "kue-kering"
@@ -8,21 +7,40 @@ export type SnackCategorySlug =
 
 export type HargaTipe = "per-pcs" | "per-box" | "per-pax" | "paket";
 
+export type Tag =
+  | "manis"
+  | "asin"
+  | "pedas"
+  | "favorit"
+  | "anak-anak"
+  | "rapat"
+  | "pengajian"
+  | "wedding"
+  | "coffee-shop"
+  | "hampers";
+
 export interface SnackItem {
   id: string;
   nama: string;
   deskripsi?: string;
-  /**
-   * Label harga yang ditampilkan ke user, misalnya:
-   * "Mulai Rp10.000 / box" atau "Rp2.500 – Rp3.500 / pcs"
-   */
+
+  // opsional kalau beda dari default kategori
   labelHarga?: string;
-  /**
-   * Minimal order (optional), misalnya: 30 box
-   */
   minimalOrder?: string;
+
   cocokUntuk?: string;
   catatanTambahan?: string;
+
+  // untuk rekomendasi chatbot (ringkas, hemat token)
+  tags?: Tag[];
+}
+
+export interface CategoryDefaults {
+  labelHargaDefault?: string; // biar gak ngulang di tiap item
+  minimalOrderDefault?: string;
+  leadTimeDefault?: string; // mis: H-1 15.00
+  allowMix?: boolean;
+  notes?: string[];
 }
 
 export interface SnackCategory {
@@ -30,8 +48,43 @@ export interface SnackCategory {
   namaKategori: string;
   deskripsiSingkat: string;
   tipeHargaUtama: HargaTipe;
+  defaults?: CategoryDefaults;
   items: SnackItem[];
 }
+
+/** Info global (yang sering ditanya) */
+export const ORDER_INFO = {
+  lokasiSingkat: "Gubug, Grobogan",
+  jamProduksi: "16.00 - 05.00 WIB",
+  jamAdmin: "08.00 - 20.00 WIB",
+  cutOffOrderBesar: "H-1 pukul 15.00 WIB",
+  pembayaran: [
+    "Transfer bank (detail dikirim saat konfirmasi).",
+    "E-wallet tertentu bila tersedia (mengikuti konfirmasi admin).",
+  ],
+  catatanHarga:
+    "Sebagian harga bisa berubah tergantung bahan baku & volume order. Harga final dikonfirmasi admin.",
+} as const;
+
+/** FAQ super ringkas untuk chatbot */
+export const FAQ_GLOBAL = [
+  {
+    q: "Bisa mix varian dalam 1 box?",
+    a: "Bisa, varian bisa dicampur sesuai stok hari itu. Untuk paket acara, admin bantu susun komposisinya.",
+  },
+  {
+    q: "Minimal order snack box berapa?",
+    a: "Umumnya minimal 20-30 box (tergantung paket). Untuk acara besar, disarankan konfirmasi lebih awal.",
+  },
+  {
+    q: "Bisa request tanpa pedas/preferensi tertentu?",
+    a: "Bisa. Info pantangan/alergi dan preferensi manis/asin boleh ditulis saat pesan.",
+  },
+  {
+    q: "Cara pesan gimana?",
+    a: "Cukup kirim kategori, jumlah, tanggal, dan lokasi. Admin konfirmasi menu, slot produksi, dan total harga.",
+  },
+] as const;
 
 export const PAKET_SNACK: SnackCategory[] = [
   {
@@ -40,133 +93,141 @@ export const PAKET_SNACK: SnackCategory[] = [
     deskripsiSingkat:
       "Paket snack box untuk rapat kantor, pengajian, dan acara keluarga.",
     tipeHargaUtama: "per-box",
+    defaults: {
+      minimalOrderDefault: "30 box",
+      leadTimeDefault: "H-1 pukul 15.00 WIB (untuk order besar)",
+      allowMix: true,
+      notes: ["Isi paket bisa disesuaikan budget & preferensi manis/asin."],
+    },
     items: [
       {
         id: "sb-isi-3",
         nama: "Snack Box Isi 3 Item",
         deskripsi: "Umumnya 2 kue basah + 1 kudapan kering.",
-        labelHarga: "Mulai Rp10.000 / box",
-        minimalOrder: "30 box",
+        labelHarga: "Mulai Rp6.000/box",
+        minimalOrder: "50 box",
         cocokUntuk: "Rapat singkat, pengajian, acara keluarga kecil",
+        tags: ["rapat", "pengajian", "favorit"],
       },
       {
         id: "sb-isi-4",
         nama: "Snack Box Isi 4 Item",
         deskripsi: "Kombinasi manis & asin, bisa ditambah gorengan pilihan.",
-        labelHarga: "Mulai Rp13.000 / box",
-        minimalOrder: "30 box",
+        labelHarga: "Mulai Rp8.000/box",
+        minimalOrder: "50 box",
         cocokUntuk: "Meeting kantor & acara komunitas",
+        tags: ["rapat", "favorit"],
       },
       {
         id: "sb-pagi",
         nama: "Snack Box Pagi (kue + roti + air mineral)",
         deskripsi: "Cocok untuk acara pagi hari atau pelatihan.",
-        labelHarga: "Mulai Rp15.000 / box",
-        minimalOrder: "30 box",
+        labelHarga: "Mulai Rp10.000/box",
+        minimalOrder: "50 box",
         cocokUntuk: "Pelatihan, seminar pagi, acara kampus",
+        tags: ["rapat"],
       },
       {
         id: "sb-arisan",
-        nama: "Paket Arisan / Pengajian",
+        nama: "Paket Arisan/Pengajian",
         deskripsi: "Isi bisa dikustom sesuai kebutuhan dan budget.",
-        labelHarga: "Mulai Rp20.000 / orang (estimasi)",
-        minimalOrder: "20 paket",
+        labelHarga: "Mulai Rp6.000/orang (estimasi)",
+        minimalOrder: "50 paket",
         cocokUntuk: "Arisan, pengajian, kumpul keluarga",
         catatanTambahan:
           "Detail isi & harga final disesuaikan dan dikonfirmasi admin.",
+        tags: ["pengajian", "favorit"],
       },
       {
         id: "sb-kantor-rutin",
         nama: "Paket Kantor Rutin (mingguan/bulanan)",
         deskripsi: "Snack box berulang untuk kantor atau instansi.",
         labelHarga: "By request (harga khusus kontrak)",
-        cocokUntuk: "Kontrak rutin kantor / instansi",
+        cocokUntuk: "Kontrak rutin kantor/instansi",
         catatanTambahan:
           "Harga & isi paket disusun khusus sesuai kebutuhan perusahaan.",
+        tags: ["rapat"],
       },
     ],
   },
+
   {
     slug: "kue-basah",
     namaKategori: "Kue Basah",
-    deskripsiSingkat:
-      "Kue tradisional dengan tampilan rapi, diproduksi harian.",
+    deskripsiSingkat: "Kue tradisional dengan tampilan rapi, diproduksi harian.",
     tipeHargaUtama: "per-pcs",
+    defaults: {
+      labelHargaDefault: "Rp1.500/pcs",
+      allowMix: true,
+      notes: ["Harga fix untuk kategori kue basah (varian sesuai stok harian)."],
+    },
     items: [
-      {
-        id: "kb-klepon",
-        nama: "Klepon Pandan",
-        labelHarga: "Perkiraan Rp2.000 – Rp2.500 / pcs",
-        cocokUntuk: "Snack box & tampah tradisional",
-      },
-      {
-        id: "kb-dadar",
-        nama: "Dadar Gulung Cokelat",
-        labelHarga: "Perkiraan Rp2.500 – Rp3.000 / pcs",
-      },
-      {
-        id: "kb-nagasi",
-        nama: "Nagasi Pisang",
-        labelHarga: "Perkiraan Rp2.500 – Rp3.000 / pcs",
-      },
-      {
-        id: "kb-lemper",
-        nama: "Lemper Ayam",
-        labelHarga: "Perkiraan Rp3.000 – Rp3.500 / pcs",
-      },
+      { id: "kb-putu-ayu", nama: "Putu Ayu", deskripsi: "Lembut, wangi pandan, topping kelapa gurih.", tags: ["manis", "favorit"] },
+      { id: "kb-lapis", nama: "Lapis Bunga", deskripsi: "Lapis warna-warni, kenyal manis lembut.", tags: ["manis"] },
+      { id: "kb-dadar", nama: "Dadar Gulung", deskripsi: "Kulit pandan lembut, isi kelapa gula merah.", tags: ["manis"] },
+      { id: "kb-bolu-kukus", nama: "Bolu Kukus Mekar", deskripsi: "Empuk, mekar cantik, cocok snack box.", tags: ["manis", "anak-anak"] },
+      { id: "kb-lemper", nama: "Lemper", deskripsi: "Ketan pulen, isi ayam suwir gurih.", tags: ["asin", "favorit"] },
+      { id: "kb-arem", nama: "Arem-arem", deskripsi: "Nasi padat berbumbu, isi sayur/lauk gurih.", tags: ["asin"] },
+      { id: "kb-risoles", nama: "Risoles", deskripsi: "Kulit tipis, isi ragout gurih, renyah.", tags: ["asin", "favorit"] },
+      { id: "kb-pastel", nama: "Pastel", deskripsi: "Kulit renyah, isi sayur & telur.", tags: ["asin"] },
     ],
   },
+
   {
     slug: "kue-kering",
     namaKategori: "Kue Kering",
-    deskripsiSingkat:
-      "Produksi musiman & reguler untuk hampers dan gift perusahaan.",
+    deskripsiSingkat: "Produksi musiman & reguler untuk hampers dan gift.",
     tipeHargaUtama: "paket",
+    defaults: {
+      labelHargaDefault: "Harga menyesuaikan isi & musim (konfirmasi admin).",
+      notes: ["Cocok untuk hampers dan parcel perusahaan."],
+    },
     items: [
-      {
-        id: "kk-kastengel",
-        nama: "Kastengel",
-        labelHarga: "Per toples (isi & harga menyesuaikan musim)",
-      },
-      {
-        id: "kk-nastar",
-        nama: "Nastar",
-        labelHarga: "Per toples (isi & harga menyesuaikan musim)",
-      },
-      {
-        id: "kk-putri-salju",
-        nama: "Putri Salju",
-        labelHarga: "Per toples (isi & harga menyesuaikan musim)",
-      },
-      {
-        id: "kk-sagu-keju",
-        nama: "Sagu Keju",
-        labelHarga: "Per toples (isi & harga menyesuaikan musim)",
-      },
+      { id: "kk-nastar-nanas", nama: "Nastar Nanas", deskripsi: "Lumer, isi nanas legit, butter wangi.", tags: ["hampers", "favorit"] },
+      { id: "kk-keciput", nama: "Keciput", deskripsi: "Gurih manis dengan wijen renyah.", tags: ["hampers"] },
+      { id: "kk-unthuk-yuyu", nama: "Unthuk Yuyu", deskripsi: "Kue kering tradisional, renyah dan wangi.", tags: ["hampers"] },
+      { id: "kk-putri-salju", nama: "Putri Salju", deskripsi: "Lembut, tabur gula halus tebal.", tags: ["hampers", "favorit"] },
+      { id: "kk-kastengel", nama: "Kastengel", deskripsi: "Keju kuat, gurih, tekstur renyah.", tags: ["hampers", "favorit"] },
     ],
   },
+
   {
     slug: "kue-tart-cake",
-    namaKategori: "Kue Tart & Cake",
-    deskripsiSingkat:
-      "Cake dekoratif untuk ulang tahun, syukuran, dan display coffee shop.",
+    namaKategori: "Kue Tart & Bolu Panggang",
+    deskripsiSingkat: "Tart dekoratif dan bolu panggang untuk berbagai acara.",
     tipeHargaUtama: "paket",
+    defaults: {
+      labelHargaDefault: "Harga menyesuaikan ukuran & dekor (konfirmasi admin).",
+      notes: ["Bisa custom ucapan & tema warna."],
+    },
     items: [
       {
-        id: "kt-fresh-cream",
-        nama: "Tart Fresh Cream",
-        labelHarga: "Harga menyesuaikan ukuran & dekor",
-        catatanTambahan: "Bisa custom ucapan & tema warna.",
+        id: "kt-fresh-cream-16",
+        nama: "Tart Fresh Cream Ø 16 cm",
+        labelHarga: "Mulai Rp180.000",
+        deskripsi: "Manis seimbang, dekor minimalis, topping bisa custom.",
+        tags: ["wedding", "favorit"],
+      },
+      {
+        id: "kt-fresh-cream-20",
+        nama: "Tart Fresh Cream Ø 20 cm",
+        labelHarga: "Mulai Rp120.000",
+        deskripsi: "Cocok untuk 15–20 orang, bisa request tulisan.",
+        tags: ["wedding", "favorit"],
       },
       {
         id: "kt-butter-cake",
-        nama: "Butter Cake",
-        labelHarga: "Mulai ukuran loyang kecil (harga by request)",
+        nama: "Butter Cake Loyang",
+        labelHarga: "Mulai Rp40.000/loyang",
+        deskripsi: "Tekstur padat lembut, enak untuk potong-potong.",
+        tags: ["coffee-shop"],
       },
       {
         id: "kt-brownies",
         nama: "Brownies Panggang",
-        labelHarga: "Per loyang / slice, harga by request",
+        labelHarga: "Mulai Rp35.000/loyang",
+        deskripsi: "Cokelat intens, cocok untuk slice & coffee pairing.",
+        tags: ["coffee-shop", "favorit"],
       },
     ],
   },
@@ -174,4 +235,9 @@ export const PAKET_SNACK: SnackCategory[] = [
 
 export function getCategoryBySlug(slug: SnackCategorySlug): SnackCategory | undefined {
   return PAKET_SNACK.find((c) => c.slug === slug);
+}
+
+/** Helper hemat token untuk chatbot/UI: harga item fallback ke default */
+export function getItemDisplayPrice(cat: SnackCategory, item: SnackItem) {
+  return item.labelHarga ?? cat.defaults?.labelHargaDefault ?? "";
 }
