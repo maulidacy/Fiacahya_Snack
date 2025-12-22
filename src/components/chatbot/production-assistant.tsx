@@ -21,6 +21,10 @@ type RecommendSeed = {
   occasion?: string;
   time?: "pagi" | "siang" | "sore" | "malam";
   peopleCount?: number;
+  itemCount?: 3 | 4;
+  wantsDrink?: boolean;
+  preference?: "gurih" | "manis" | "campur";
+  method?: "kukus" | "panggang" | "goreng";
 };
 
 function extractSeedUpdate(text: string): Partial<RecommendSeed> {
@@ -28,9 +32,9 @@ function extractSeedUpdate(text: string): Partial<RecommendSeed> {
 
   const time =
     t.includes("pagi") ? "pagi" :
-      t.includes("siang") ? "siang" :
-        t.includes("sore") ? "sore" :
-          t.includes("malam") ? "malam" : undefined;
+    t.includes("siang") ? "siang" :
+    t.includes("sore") ? "sore" :
+    t.includes("malam") ? "malam" : undefined;
 
   const m = t.match(/(\d{1,4})\s*(orang|pax|org)?/);
   const peopleCount = m ? Number(m[1]) : undefined;
@@ -42,10 +46,40 @@ function extractSeedUpdate(text: string): Partial<RecommendSeed> {
   else if (t.includes("hampers") || t.includes("parcel") || t.includes("hadiah")) occasion = "hampers";
   else if (t.includes("nikah") || t.includes("wedding") || t.includes("pernikahan")) occasion = "wedding";
 
+  // itemCount
+  let itemCount: 3 | 4 | undefined;
+  if (t.includes("isi 4") || t.includes("4 item") || t.includes("empat item")) itemCount = 4;
+  if (t.includes("isi 3") || t.includes("3 item") || t.includes("tiga item")) itemCount = 3;
+
+  // wantsDrink
+  const wantsDrink =
+    t.includes("minum") ||
+    t.includes("minuman") ||
+    t.includes("air mineral") ||
+    t.includes("air putih") ||
+    t.includes("teh");
+
+  // preference (gurih/manis)
+  let preference: RecommendSeed["preference"] | undefined;
+  if (t.includes("gurih") || t.includes("asin")) preference = "gurih";
+  else if (t.includes("manis")) preference = "manis";
+  else if (t.includes("campur") || t.includes("mix")) preference = "campur";
+
+  // method (kukus/panggang/goreng)
+  let method: RecommendSeed["method"] | undefined;
+  if (t.includes("kukus")) method = "kukus";
+  else if (t.includes("panggang") || t.includes("baked")) method = "panggang";
+  else if (t.includes("goreng")) method = "goreng";
+
   const out: Partial<RecommendSeed> = {};
   if (occasion) out.occasion = occasion;
   if (time) out.time = time;
   if (peopleCount && Number.isFinite(peopleCount)) out.peopleCount = peopleCount;
+  if (itemCount) out.itemCount = itemCount;
+  if (wantsDrink) out.wantsDrink = true;
+  if (preference) out.preference = preference;
+  if (method) out.method = method;
+
   return out;
 }
 
@@ -107,90 +141,86 @@ export function ProductionAssistant() {
   }
 
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const trimmed = input.trim();
-    if (!trimmed || loading) return;
+  e.preventDefault();
+  const trimmed = input.trim();
+  if (!trimmed || loading) return;
 
-    const userId = nextId.current++;
-    setMessages((prev) => [...prev, { id: userId, role: "user", content: trimmed }]);
-    setInput("");
-    setLoading(true);
+  const userId = nextId.current++;
+  setMessages((prev) => [...prev, { id: userId, role: "user", content: trimmed }]);
+  setInput("");
+  setLoading(true);
 
-    const lower = trimmed.toLowerCase();
-    const isRecommendRequest =
-      lower.includes("rekomendasi") ||
-      lower.includes("rekomedasi") ||
-      lower.includes("rekomen") ||
-      lower.includes("saran") ||
-      lower.includes("bingung") ||
-      lower.includes("menu untuk") ||
-      lower.includes("cocok untuk") ||
-      lower.includes("bantu pilih");
+  const lower = trimmed.toLowerCase();
+  const isRecommendRequest =
+    lower.includes("rekomendasi") ||
+    lower.includes("rekomedasi") ||
+    lower.includes("rekomen") ||
+    lower.includes("saran") ||
+    lower.includes("bingung") ||
+    lower.includes("menu untuk") ||
+    lower.includes("cocok untuk") ||
+    lower.includes("bantu pilih");
 
-    // hitung seed baru dulu (biar tidak ngirim state lama)
-    const seedUpdate = extractSeedUpdate(trimmed);
-    const nextSeed: RecommendSeed =
-      mode === "recommend"
-        ? { ...recSeed, ...seedUpdate }
-        : isRecommendRequest
-          ? { ...seedUpdate } // start baru
-          : recSeed;
+  // hitung seed baru dulu (biar tidak ngirim state lama)
+  const seedUpdate = extractSeedUpdate(trimmed);
+  const nextSeed: RecommendSeed =
+    mode === "recommend"
+      ? { ...recSeed, ...seedUpdate }
+      : isRecommendRequest
+        ? { ...seedUpdate } // start baru
+        : recSeed;
 
-    // mode juga ditentukan dari input user (bukan dari reply bot)
-    const nextMode: "default" | "recommend" =
-      mode === "recommend" ? "recommend" : isRecommendRequest ? "recommend" : "default";
+  // mode yang DIKIRIM ke server
+  const nextMode: "default" | "recommend" =
+    mode === "recommend" ? "recommend" : isRecommendRequest ? "recommend" : "default";
 
-    // simpan ke state untuk UI selanjutnya
-    setRecSeed(nextSeed);
-    setMode(nextMode);
+  // simpan seed untuk request ini
+  setRecSeed(nextSeed);
 
-    try {
-      const res = await fetch("/api/fiacahya-assistant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed, mode: nextMode, seed: nextSeed }),
-      });
+  try {
+    const res = await fetch("/api/fiacahya-assistant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: trimmed, mode: nextMode, seed: nextSeed }),
+    });
 
-      if (!res.ok) throw new Error("API error");
+    if (!res.ok) throw new Error("API error");
 
-      const data: { reply?: string; meta?: { recommendState?: "ask" | "done" | "none" } } = await res.json();
+    const data: { reply?: string; meta?: { recommendState?: "none" | "ask" | "done" } } =
+      await res.json();
 
-      const replyText =
-        data.reply ?? "Maaf, saya tidak menerima jawaban dari server. Coba lagi sebentar, ya.";
+    const replyText =
+      data.reply ?? "Maaf, saya tidak menerima jawaban dari server. Coba lagi sebentar, ya.";
 
-      const state = data.meta?.recommendState ?? "none";
-
-      // kontrol mode dari meta, bukan dari teks
-      if (state === "ask") {
-        setMode("recommend"); // masih follow-up
-      } else if (state === "done") {
-        setMode("default"); // sudah final → keluar dari mode recommend
-        setRecSeed({});
-      } else {
-        // none → OpenAI normal
-        setMode("default");
-      }
-
-      const botId = nextId.current++;
-      setMessages((prev) => [...prev, { id: botId, role: "assistant", content: replyText }]);
-    } catch (err) {
-      console.error(err);
+    // kunci mode berdasarkan meta server (lebih akurat)
+    const state = data.meta?.recommendState ?? "none";
+    if (state === "ask") {
+      setMode("recommend");
+    } else {
       setMode("default");
       setRecSeed({});
-
-      const botId = nextId.current++;
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: botId,
-          role: "assistant",
-          content: "Maaf, terjadi gangguan teknis saat menghubungi asisten. Silakan coba lagi beberapa saat.",
-        },
-      ]);
-    } finally {
-      setLoading(false);
     }
+
+    const botId = nextId.current++;
+    setMessages((prev) => [...prev, { id: botId, role: "assistant", content: replyText }]);
+  } catch (err) {
+    console.error(err);
+    setMode("default");
+    setRecSeed({});
+
+    const botId = nextId.current++;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: botId,
+        role: "assistant",
+        content: "Maaf, terjadi gangguan teknis saat menghubungi asisten. Silakan coba lagi beberapa saat.",
+      },
+    ]);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <>

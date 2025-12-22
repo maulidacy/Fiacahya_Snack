@@ -21,47 +21,23 @@ Aturan penting:
 5. Kalau pertanyaannya di luar konteks snack / bakery, jawab singkat bahwa kamu hanya asisten untuk Fiacahya Snack.
 `;
 
-type RequestBody = {
-  message?: unknown;
-  mode?: unknown;
-  seed?: unknown;
-};
-
-function toSeed(seedRaw: unknown): RecommendSeed {
-  if (!seedRaw || typeof seedRaw !== "object") return {};
-  const s = seedRaw as Partial<RecommendSeed>;
-  return {
-    occasion: typeof s.occasion === "string" ? s.occasion : undefined,
-    time:
-      s.time === "pagi" || s.time === "siang" || s.time === "sore" || s.time === "malam"
-        ? s.time
-        : undefined,
-    peopleCount: typeof s.peopleCount === "number" ? s.peopleCount : undefined,
-  };
-}
-
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as RequestBody;
-
-    const userMessage =
-      typeof body?.message === "string" ? body.message.trim() : "";
-
-    const mode =
-      typeof body?.mode === "string" ? body.mode : "default";
-
-    const seed = toSeed(body?.seed);
+    const body = await req.json();
+    const userMessage = (body?.message ?? "").toString().trim();
+    const mode = (body?.mode ?? "default").toString();
+    const seed = (body?.seed ?? {}) as RecommendSeed;
 
     if (!userMessage) {
       return NextResponse.json({ error: "Pesan tidak valid." }, { status: 400 });
     }
 
-    // 1) Jalur rekomendasi lokal (hemat token)
+    // 1) Jalur rekomendasi lokal
     const rec = buildRecommendationReply(userMessage, mode === "recommend", seed);
     if (rec) {
       return NextResponse.json({
         reply: rec.reply,
-        meta: { recommendState: rec.done ? "done" : "ask" }, // FIX: pakai done
+        meta: { recommendState: rec.done ? "done" : "ask" },
       });
     }
 
@@ -73,10 +49,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      timeout: 15000,
-    });
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 15000 });
 
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
@@ -89,21 +62,13 @@ export async function POST(req: Request) {
     });
 
     const reply = completion.choices[0]?.message?.content?.trim() ?? "";
-    if (!reply) {
-      return NextResponse.json(
-        { error: "Jawaban dari model kosong." },
-        { status: 500 }
-      );
-    }
+    if (!reply) return NextResponse.json({ error: "Jawaban dari model kosong." }, { status: 500 });
 
     return NextResponse.json({ reply, meta: { recommendState: "none" } });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "unknown error";
     return NextResponse.json(
-      {
-        error: "Maaf kak, asisten lagi ada kendala. Coba lagi sebentar, ya.",
-        detail: message,
-      },
+      { error: "Maaf kak, asisten lagi ada kendala. Coba lagi sebentar, ya.", detail: message },
       { status: 500 }
     );
   }
