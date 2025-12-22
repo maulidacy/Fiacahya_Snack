@@ -17,7 +17,41 @@ const panelVariants = {
   exit: { opacity: 0, y: 10, scale: 0.98 },
 };
 
+type RecommendSeed = {
+  occasion?: string;
+  time?: "pagi" | "siang" | "sore" | "malam";
+  peopleCount?: number;
+};
+
+function extractSeedUpdate(text: string): Partial<RecommendSeed> {
+  const t = text.toLowerCase();
+
+  const time =
+    t.includes("pagi") ? "pagi" :
+      t.includes("siang") ? "siang" :
+        t.includes("sore") ? "sore" :
+          t.includes("malam") ? "malam" : undefined;
+
+  const m = t.match(/(\d{1,4})\s*(orang|pax|org)?/);
+  const peopleCount = m ? Number(m[1]) : undefined;
+
+  let occasion: string | undefined;
+  if (t.includes("pengajian") || t.includes("arisan") || t.includes("tahlil")) occasion = "pengajian";
+  else if (t.includes("rapat") || t.includes("meeting") || t.includes("kantor")) occasion = "rapat";
+  else if (t.includes("ulang tahun") || t.includes("ultah")) occasion = "ulang-tahun";
+  else if (t.includes("hampers") || t.includes("parcel") || t.includes("hadiah")) occasion = "hampers";
+  else if (t.includes("nikah") || t.includes("wedding") || t.includes("pernikahan")) occasion = "wedding";
+
+  const out: Partial<RecommendSeed> = {};
+  if (occasion) out.occasion = occasion;
+  if (time) out.time = time;
+  if (peopleCount && Number.isFinite(peopleCount)) out.peopleCount = peopleCount;
+  return out;
+}
+
 export function ProductionAssistant() {
+  const [mode, setMode] = useState<"default" | "recommend">("default");
+  const [recSeed, setRecSeed] = useState<RecommendSeed>({});
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -53,53 +87,104 @@ export function ProductionAssistant() {
     setInput(e.target.value);
   }
 
+  function extractSeed(text: string): RecommendSeed {
+    const t = text.toLowerCase();
+
+    const time =
+      t.includes("pagi") ? "pagi" :
+        t.includes("siang") ? "siang" :
+          t.includes("sore") ? "sore" :
+            t.includes("malam") ? "malam" : undefined;
+
+    let occasion: string | undefined;
+    if (t.includes("pengajian") || t.includes("arisan") || t.includes("tahlil")) occasion = "pengajian";
+    else if (t.includes("rapat") || t.includes("meeting") || t.includes("kantor")) occasion = "rapat";
+    else if (t.includes("ulang tahun") || t.includes("ultah")) occasion = "ulang-tahun";
+    else if (t.includes("hampers") || t.includes("parcel") || t.includes("hadiah")) occasion = "hampers";
+    else if (t.includes("nikah") || t.includes("wedding") || t.includes("pernikahan")) occasion = "wedding";
+
+    return { occasion, time };
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || loading) return;
 
     const userId = nextId.current++;
-    setMessages((prev) => [
-      ...prev,
-      { id: userId, role: "user", content: trimmed },
-    ]);
+    setMessages((prev) => [...prev, { id: userId, role: "user", content: trimmed }]);
     setInput("");
     setLoading(true);
+
+    const lower = trimmed.toLowerCase();
+    const isRecommendRequest =
+      lower.includes("rekomendasi") ||
+      lower.includes("rekomedasi") ||
+      lower.includes("rekomen") ||
+      lower.includes("saran") ||
+      lower.includes("bingung") ||
+      lower.includes("menu untuk") ||
+      lower.includes("cocok untuk") ||
+      lower.includes("bantu pilih");
+
+    // hitung seed baru dulu (biar tidak ngirim state lama)
+    const seedUpdate = extractSeedUpdate(trimmed);
+    const nextSeed: RecommendSeed =
+      mode === "recommend"
+        ? { ...recSeed, ...seedUpdate }
+        : isRecommendRequest
+          ? { ...seedUpdate } // start baru
+          : recSeed;
+
+    // mode juga ditentukan dari input user (bukan dari reply bot)
+    const nextMode: "default" | "recommend" =
+      mode === "recommend" ? "recommend" : isRecommendRequest ? "recommend" : "default";
+
+    // simpan ke state untuk UI selanjutnya
+    setRecSeed(nextSeed);
+    setMode(nextMode);
 
     try {
       const res = await fetch("/api/fiacahya-assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({ message: trimmed, mode: nextMode, seed: nextSeed }),
       });
 
-      if (!res.ok) {
-        throw new Error("API error");
+      if (!res.ok) throw new Error("API error");
+
+      const data: { reply?: string; meta?: { recommendState?: "ask" | "done" | "none" } } = await res.json();
+
+      const replyText =
+        data.reply ?? "Maaf, saya tidak menerima jawaban dari server. Coba lagi sebentar, ya.";
+
+      const state = data.meta?.recommendState ?? "none";
+
+      // kontrol mode dari meta, bukan dari teks
+      if (state === "ask") {
+        setMode("recommend"); // masih follow-up
+      } else if (state === "done") {
+        setMode("default"); // sudah final → keluar dari mode recommend
+        setRecSeed({});
+      } else {
+        // none → OpenAI normal
+        setMode("default");
       }
 
-      const data: { reply?: string } = await res.json();
       const botId = nextId.current++;
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: botId,
-          role: "assistant",
-          content:
-            data.reply ??
-            "Maaf, saya tidak menerima jawaban dari server. Coba lagi sebentar, ya.",
-        },
-      ]);
+      setMessages((prev) => [...prev, { id: botId, role: "assistant", content: replyText }]);
     } catch (err) {
       console.error(err);
+      setMode("default");
+      setRecSeed({});
+
       const botId = nextId.current++;
       setMessages((prev) => [
         ...prev,
         {
           id: botId,
           role: "assistant",
-          content:
-            "Maaf, terjadi gangguan teknis saat menghubungi asisten. Silakan coba lagi beberapa saat.",
+          content: "Maaf, terjadi gangguan teknis saat menghubungi asisten. Silakan coba lagi beberapa saat.",
         },
       ]);
     } finally {
@@ -112,7 +197,7 @@ export function ProductionAssistant() {
       {/* FLOATING TOGGLE BUTTON */}
       <button
         aria-label="Buka Asisten Produksi AI"
-        onClick={() => setOpen(true)}
+        onClick={() => { setOpen(true); setMode("default"); setRecSeed({}); }}
         className="
     fixed bottom-5 right-4 z-40
           inline-flex items-center justify-center
@@ -206,14 +291,12 @@ export function ProductionAssistant() {
                   >
                     <div
                       className={`
-                        max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed
-                        ${msg.role === "user"
-                          ? // USER → coklat gelap
-                          "bg-[#3E2A20] text-white border border-[#2A170F] dark:bg-[#F5E2C8] dark:text-[#2A170F] dark:border-[#E3C9A8]"
-                          : // ASSISTANT → kuning krem
-                          "bg-[#FFF5EB] text-[#3A261A] border border-[#F2C89C]"
+    max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-line
+    ${msg.role === "user"
+                          ? "bg-[#3E2A20] text-white border border-[#2A170F] dark:bg-[#F5E2C8] dark:text-[#2A170F] dark:border-[#E3C9A8]"
+                          : "bg-[#FFF5EB] text-[#3A261A] border border-[#F2C89C]"
                         }
-                      `}
+  `}
                     >
                       {msg.content}
                     </div>

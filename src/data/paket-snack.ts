@@ -183,11 +183,27 @@ export const PAKET_SNACK: SnackCategory[] = [
       notes: ["Cocok untuk hampers dan parcel perusahaan."],
     },
     items: [
-      { id: "kk-nastar-nanas", nama: "Nastar Nanas", deskripsi: "Lumer, isi nanas legit, butter wangi.", tags: ["hampers", "favorit"] },
-      { id: "kk-keciput", nama: "Keciput", deskripsi: "Gurih manis dengan wijen renyah.", tags: ["hampers"] },
-      { id: "kk-unthuk-yuyu", nama: "Unthuk Yuyu", deskripsi: "Kue kering tradisional, renyah dan wangi.", tags: ["hampers"] },
-      { id: "kk-putri-salju", nama: "Putri Salju", deskripsi: "Lembut, tabur gula halus tebal.", tags: ["hampers", "favorit"] },
-      { id: "kk-kastengel", nama: "Kastengel", deskripsi: "Keju kuat, gurih, tekstur renyah.", tags: ["hampers", "favorit"] },
+      { id: "kb-putu-ayu", nama: "Putu Ayu", deskripsi: "Lembut, wangi pandan, topping kelapa gurih.", tags: ["manis", "favorit"] },
+      { id: "kb-lapis", nama: "Lapis Bunga", deskripsi: "Lapis warna-warni, kenyal manis lembut.", tags: ["manis"] },
+      { id: "kb-dadar", nama: "Dadar Gulung", deskripsi: "Kulit pandan lembut, isi kelapa gula merah.", tags: ["manis"] },
+      { id: "kb-bolu-kukus", nama: "Bolu Kukus Mekar", deskripsi: "Empuk, mekar cantik, cocok snack box.", tags: ["manis", "anak-anak"] },
+
+      { id: "kb-lemper", nama: "Lemper", deskripsi: "Ketan pulen, isi ayam suwir gurih.", tags: ["asin", "favorit"] },
+      { id: "kb-arem", nama: "Arem-arem", deskripsi: "Nasi padat berbumbu, isi sayur/lauk gurih.", tags: ["asin"] },
+      { id: "kb-risoles", nama: "Risoles", deskripsi: "Kulit tipis, isi ragout gurih, renyah.", tags: ["asin", "favorit"] },
+      { id: "kb-pastel", nama: "Pastel", deskripsi: "Kulit renyah, isi sayur & telur.", tags: ["asin"] },
+
+      // tambahan
+      { id: "kb-lumpia", nama: "Lumpia Sayur/Ayam", deskripsi: "Kulit lumpia renyah, isi gurih.", tags: ["asin", "favorit"] },
+      { id: "kb-onde-ketawa", nama: "Onde-onde Ketawa", deskripsi: "Goreng renyah, aroma wijen.", tags: ["manis"] },
+      { id: "kb-kue-lumpur", nama: "Kue Lumpur", deskripsi: "Lembut, rasa santan dan kentang.", tags: ["manis"] },
+      { id: "kb-donat", nama: "Donat", deskripsi: "Empuk, topping gula/meses.", tags: ["manis", "anak-anak"] },
+      { id: "kb-kroket", nama: "Kroket", deskripsi: "Isi kentang gurih, cocok pendamping.", tags: ["asin"] },
+      { id: "kb-tahu-bakso", nama: "Tahu Bakso", deskripsi: "Tahu berisi adonan bakso lembut.", tags: ["asin"] },
+      { id: "kb-tahu-mercon", nama: "Tahu Mercon", deskripsi: "Isi pedas gurih, untuk yang suka pedas.", tags: ["pedas"] },
+      { id: "kb-pisang-crispy", nama: "Pisang Crispy", deskripsi: "Pisang balut tepung, renyah manis.", tags: ["manis", "anak-anak"] },
+      { id: "kb-wingko", nama: "Wingko Babat", deskripsi: "Kue kelapa panggang aroma khas.", tags: ["manis"] },
+      { id: "kb-serabi", nama: "Serabi", deskripsi: "Kue tradisional khas Jawa Barat.", tags: ["manis"] },
     ],
   },
 

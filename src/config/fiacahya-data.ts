@@ -4,16 +4,16 @@ import { PAKET_SNACK, getCategoryBySlug, SnackCategorySlug } from "@/data/paket-
 export const FIACAHYA_PROFILE = {
   brandName: "Fiacahya Snack",
   tagline: "Premium Bakery & Snack",
-  lokasiSingkat: "Gubug, Grobogan",
+  lokasiSingkat: "Godong, Grobogan",
   alamatLengkap:
-    "Produksi rumahan di Gubug, Grobogan (detail alamat dibagikan saat konfirmasi order).",
+    "Produksi rumahan di Godong, Grobogan (detail alamat dibagikan saat konfirmasi order).",
   jamOperasional: {
-    produksi: "04.00 – 16.00 WIB",
+    produksi: "04.00 - 16.00 WIB",
     cutOffOrderBesar: "H-1 pukul 15.00 WIB",
   },
   kontak: {
-    whatsappAdmin: "0812-3456-7890",
-    email: "hello@fiacahya-snack.com",
+    whatsappAdmin: "0882-0085-26405",
+    email: "fiacahyasnackk@gmail.com",
     instagram: "@fiacahya.snack",
   },
   catatanUmum:
