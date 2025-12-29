@@ -2,23 +2,29 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { buildRecommendationReply, type RecommendSeed } from "@/lib/recommendation";
+import { ORDER_INFO, FAQ_GLOBAL } from "@/data/paket-snack";
 
 export const runtime = "nodejs";
 
 const FIACAHYA_ASSISTANT_SYSTEM_PROMPT = `
 Kamu adalah asisten produksi & pemesanan Fiacahya Snack.
 
-• Brand: Fiacahya Snack
-• Lokasi utama: Desa Tungu RT.12/RW.02 Kec. Godong, Kab. Grobogan
-• Lini produk: kue basah, kue kering, cake/tart, snack box & paket acara.
-• Gaya bahasa: ramah, jelas, singkat, pakai bahasa Indonesia, panggil "kak".
+Info operasional:
+- Jam produksi: ${ORDER_INFO.jamProduksi}
+- Jam admin: ${ORDER_INFO.jamAdmin}
+- Cut off order besar: ${ORDER_INFO.cutOffOrderBesar}
+- Lokasi: ${ORDER_INFO.lokasiSingkat}
+
+FAQ:
+${FAQ_GLOBAL.map((x) => `Q: ${x.q}\nA: ${x.a}`).join("\n\n")}
 
 Aturan penting:
-1. Jawab maksimal 3-4 kalimat. Untuk pertanyaan sederhana cukup 1–2 kalimat.
-2. Jawab spesifik, jangan mengulang informasi yang sudah disebut di chat sebelumnya.
-3. Fokus pada: menu, harga, paket snack box, cara pesan, jam produksi, estimasi kapasitas.
-4. Jika harga / paket tidak ada di data sistem, jangan mengarang. Jelaskan bahwa harga bisa berubah dan arahkan untuk konfirmasi via WhatsApp Fiacahya Snack.
-5. Kalau pertanyaannya di luar konteks snack / bakery, jawab singkat bahwa kamu hanya asisten untuk Fiacahya Snack.
+1. Gaya bahasa: ramah, jelas, singkat, pakai bahasa Indonesia, panggil "kak".
+2. Jawab maksimal 3-4 kalimat. Untuk pertanyaan sederhana cukup 1–2 kalimat.
+3. Jawab spesifik, jangan mengulang informasi yang sudah disebut di chat sebelumnya.
+4. Fokus pada: menu, harga, paket snack box, cara pesan, jam produksi, estimasi kapasitas.
+5. Jika harga/paket tidak ada di data sistem, jangan mengarang. Jelaskan bahwa harga bisa berubah dan arahkan untuk konfirmasi via WhatsApp Fiacahya Snack.
+6. Kalau pertanyaannya di luar konteks snack/bakery, jawab singkat bahwa kamu hanya asisten untuk Fiacahya Snack.
 `;
 
 export async function POST(req: Request) {
@@ -26,7 +32,14 @@ export async function POST(req: Request) {
     const body = await req.json();
     const userMessage = (body?.message ?? "").toString().trim();
     const mode = (body?.mode ?? "default").toString();
-    const seed = (body?.seed ?? {}) as RecommendSeed;
+    const rawSeed = (body?.seed ?? {}) as Partial<RecommendSeed> & {
+      preference?: "gurih" | "manis" | "campur";
+    };
+
+    const seed: RecommendSeed = {
+      ...rawSeed,
+      taste: rawSeed?.taste ?? rawSeed?.preference,
+    };
 
     if (!userMessage) {
       return NextResponse.json({ error: "Pesan tidak valid." }, { status: 400 });
