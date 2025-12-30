@@ -36,8 +36,13 @@ export async function POST(req: Request) {
       preference?: "gurih" | "manis" | "campur";
     };
 
+    const nonce =
+      (body?.nonce ?? "").toString() ||
+      `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
     const seed: RecommendSeed = {
       ...rawSeed,
+      nonce,
       taste: rawSeed?.taste ?? rawSeed?.preference,
     };
 

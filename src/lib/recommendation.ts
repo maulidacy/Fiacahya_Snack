@@ -560,22 +560,19 @@ function pickKueBasahFiltered(
 function pickSnackBoxFillingsMixed(
   seed: number,
   itemCount: 3 | 4,
-  occasion?: Context["occasion"]
+  occasion?: Context["occasion"],
+  allowSpicy?: boolean
 ) {
-  const kb = pickCategory("kue-basah");
-  if (!kb) return [];
+  const poolGlobal = uniqueById(getSnackBoxPool({ allowSpicy }));
+  if (!poolGlobal.length) return [];
 
-  // pool berdasarkan occasion (rapat/pengajian/etc)
-  const poolOccasion = kb.items.filter((it) => matchesOccasion(it, occasion));
-
-  // pool global sebagai backup agar tetap bisa mix
-  const poolGlobal = kb.items;
+  const poolOccasion = poolGlobal.filter((it) => matchesOccasion(it, occasion));
 
   // ambil manis/gurih dari pool occasion dulu
   let manisPool = poolOccasion.filter((it) => (it.tags ?? []).includes("manis"));
   let gurihPool = poolOccasion.filter((it) => (it.tags ?? []).includes("asin"));
 
-  // kalau kurang, ambil tambahan dari pool global
+  // kalau kurang, fallback ke pool global
   if (manisPool.length < 1) {
     manisPool = poolGlobal.filter((it) => (it.tags ?? []).includes("manis"));
   }
@@ -586,29 +583,32 @@ function pickSnackBoxFillingsMixed(
   const manisShuffled = shuffleWithSeed(manisPool, seed + 11);
   const gurihShuffled = shuffleWithSeed(gurihPool, seed + 22);
 
-  // target komposisi (wajib mix)
+  // target komposisi
   const isThree = itemCount === 3;
   const rand = (seed % 2) === 0;
-
   const targetManis = isThree ? (rand ? 2 : 1) : 2;
-  const targetGurih = isThree ? (rand ? 1 : 2) : 2;
+  const targetGurih = isThree ? (rand ? 1 : 2) : 1; // penting: 4 item = 3 makanan (2 manis + 1 gurih)
 
   const out: SnackItem[] = [];
 
-  // ambil manis sesuai target
+  // manis
   for (const it of manisShuffled) {
     if (out.length >= targetManis) break;
     out.push(it);
   }
 
-  // ambil gurih sesuai target
+  // gurih
   for (const it of gurihShuffled) {
     if (out.length >= targetManis + targetGurih) break;
     if (!out.find((x) => x.id === it.id)) out.push(it);
   }
 
-  // fallback kalau masih kurang item (ambil dari global mix)
-  const combined = shuffleWithSeed(uniqueById([...poolOccasion, ...poolGlobal]), seed + 33);
+  // fallback bila masih kurang (ambil dari poolOccasion dulu agar relevan)
+  const combined = shuffleWithSeed(
+    uniqueById([...poolOccasion, ...poolGlobal]),
+    seed + 33
+  );
+
   for (const it of combined) {
     if (out.length >= itemCount) break;
     if (!out.find((x) => x.id === it.id)) out.push(it);
