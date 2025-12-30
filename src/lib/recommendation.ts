@@ -28,6 +28,7 @@ type Context = {
 
   taste?: "gurih" | "manis" | "campur";
   method?: "kukus" | "panggang" | "goreng" | "campur";
+  budget?: "hemat" | "standar" | "premium";
 };
 
 export type RecommendSeed = {
@@ -38,6 +39,7 @@ export type RecommendSeed = {
   wantsDrink?: boolean;
   taste?: "gurih" | "manis" | "campur";
   method?: "kukus" | "panggang" | "goreng" | "campur";
+  budget?: "hemat" | "standar" | "premium";
 };
 
 export type RecommendationResult = {
@@ -169,6 +171,26 @@ function guessWantsDrink(text: string): boolean {
   );
 }
 
+function guessBudget(text: string): Context["budget"] {
+  const t = normalize(text);
+  if (
+    t.includes("hemat") ||
+    t.includes("murah") ||
+    t.includes("budget") ||
+    t.includes("minim") ||
+    t.includes("low budget")
+  )
+    return "hemat";
+
+  if (t.includes("premium") || t.includes("eksklusif") || t.includes("mahal"))
+    return "premium";
+
+  if (t.includes("standar") || t.includes("normal") || t.includes("sedang"))
+    return "standar";
+
+  return undefined;
+}
+
 function guessTaste(text: string): Context["taste"] {
   const t = normalize(text);
   const gurih = t.includes("gurih") || t.includes("asin");
@@ -193,6 +215,8 @@ function guessMethod(text: string): Context["method"] {
   return undefined;
 }
 
+
+
 function detectContext(userMessage: string): Context {
   const t = userMessage.toLowerCase();
   const intent: Context["intent"] = isRecommendIntent(userMessage)
@@ -206,9 +230,11 @@ function detectContext(userMessage: string): Context {
   const wantsDrink = guessWantsDrink(userMessage);
   const taste = guessTaste(userMessage);
   const method = guessMethod(userMessage);
+  const budget = guessBudget(userMessage);
 
   return {
     intent,
+    budget,
     occasion,
     time,
     peopleCount,
@@ -287,6 +313,15 @@ function formatOption(name: string, hint?: string) {
   return hint ? `- ${name} - ${hint}` : `- ${name}`;
 }
 
+// --- PATCH: TIME SALT untuk variasi rekomendasi ---
+// Berubah tiap 3 jam agar rekomendasi tidak identik terus untuk pesan yang sama.
+function getTimeSalt(hoursWindow = 3) {
+  const now = new Date();
+  const bucket = Math.floor(now.getHours() / hoursWindow); // 0..7 untuk 3 jam
+  return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-b${bucket}`;
+}
+// --- END PATCH ---
+
 function hashStr(s: string) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
@@ -317,6 +352,33 @@ function shuffleWithSeed<T>(arr: T[], seed: number) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+const DRINKS = {
+  hemat: ["Air mineral cup"],
+  standar: ["Teh manis", "Air mineral botol"],
+  premium: ["Teh botol", "Air mineral premium"],
+} as const;
+
+function pickDrink(ctx: Context, seedNum: number, userMessage: string) {
+  const tier = ctx.budget ?? "standar";
+  const pool = [...DRINKS[tier]];
+
+  // Penyesuaian konteks sederhana (aman & tidak halusinasi harga)
+  if (ctx.time === "pagi" && ctx.occasion === "rapat") {
+    // teh manis lebih relevan untuk pagi rapat jika tersedia di tier
+    if (tier !== "hemat" && pool.includes("Teh manis")) return "Teh manis";
+  }
+
+  // kalau user spesifik minta air mineral/teh, ikuti
+  const t = normalize(userMessage);
+  if (t.includes("air mineral") || t.includes("air putih")) return tier === "hemat" ? "Air mineral cup" : "Air mineral botol";
+  if (t.includes("teh botol")) return tier === "premium" ? "Teh botol" : "Teh manis";
+  if (t.includes("teh")) return tier === "hemat" ? "Air mineral cup" : "Teh manis";
+
+  // fallback random stabil
+  const shuffled = shuffleWithSeed(pool as unknown as string[], seedNum + 99);
+  return shuffled[0] ?? "Air mineral cup";
 }
 
 function reasonForOccasion(occ?: Context["occasion"]) {
@@ -554,16 +616,26 @@ function pickSnackBoxPack(ctx: Context, seedNum: number) {
   const sb = pickCategory("snack-box-paket");
   if (!sb?.items?.length) return undefined;
 
+  // --- PATCH: PRIORITAS PAKET PAGI UNTUK RAPAT PAGI ---
+  // Jika user rapat pagi dan tidak menyebut isi 3/4 item, pilih sb-pagi.
+  if (ctx.occasion === "rapat" && ctx.time === "pagi" && !ctx.itemCount) {
+    const pagi = sb.items.find((x) => x.id === "sb-pagi");
+    if (pagi) return pagi;
+  }
+  // --- END PATCH ---
+
   const targetTags: Tag[] =
     ctx.occasion === "rapat"
       ? ["rapat"]
       : ctx.occasion === "pengajian"
         ? ["pengajian"]
-        : ctx.occasion === "wedding"
-          ? ["wedding"]
-          : ctx.occasion === "hampers"
-            ? ["hampers"]
-            : ["favorit"];
+        : ctx.occasion === "ulang-tahun"
+          ? ["favorit", "anak-anak"]
+          : ctx.occasion === "wedding"
+            ? ["wedding", "favorit"]
+            : ctx.occasion === "hampers"
+              ? ["hampers", "favorit"]
+              : ["favorit"];
 
   const want4 = ctx.itemCount === 4;
   const scored = sb.items
@@ -614,6 +686,7 @@ export function buildRecommendationReply(
     if (!ctx.wantsDrink && seed?.wantsDrink) ctx.wantsDrink = seed.wantsDrink;
     if (!ctx.taste && seed?.taste) ctx.taste = seed.taste;
     if (!ctx.method && seed?.method) ctx.method = seed.method;
+    if (!ctx.budget && seed?.budget) ctx.budget = seed.budget;
   }
 
   if (ctx.intent !== "recommend" && !force) return null;
@@ -634,10 +707,12 @@ export function buildRecommendationReply(
     return { done: false, reply: `Siap, kak. ${followUps.join(" ")}`.trim() };
   }
 
-  // seedNum baru dibuat DI SINI (sebelum dipakai)
+  // --- PATCH: seed variatif dengan timeSalt ---
+  const timeSalt = getTimeSalt(3);
   const seedNum = hashStr(
-    `${userMessage}|${ctx.occasion}|${ctx.time}|${ctx.peopleCount}|${itemCount}|${ctx.taste}|${ctx.method}`
+    `${userMessage}|${ctx.occasion}|${ctx.time}|${ctx.peopleCount}|${itemCount}|${ctx.taste}|${ctx.method}|${ctx.budget}|${timeSalt}`
   );
+  // --- END PATCH ---
 
   const prefLabel =
     ctx.taste === "gurih"
@@ -681,10 +756,11 @@ export function buildRecommendationReply(
     const pack = pickSnackBoxPack(ctx, seedNum);
     const reason = reasonForOccasion(ctx.occasion);
     if (pack) out.push(formatOption(`Paket: ${pack.nama}`, reason));
-  }
 
-  if (askedSnackBox && (itemCount === 4)) {
-    ctx.wantsDrink = true;
+    // Set wantsDrink safely without breaking old logic
+    if (itemCount === 4 || pack?.id === "sb-pagi" || (pack && (pack.nama.toLowerCase().includes("air mineral") || pack.nama.toLowerCase().includes("minuman")))) {
+      ctx.wantsDrink = true;
+    }
   }
   // Isian makanan
   let fillings: SnackItem[] = [];
@@ -729,8 +805,10 @@ export function buildRecommendationReply(
     out.push(formatOption(it.nama, labelForItem(it)));
   }
 
-  if (ctx.wantsDrink)
-    out.push(formatOption("Air mineral cup/botol", "opsional minuman"));
+  if (ctx.wantsDrink) {
+    const drink = pickDrink(ctx, seedNum, userMessage);
+    out.push(formatOption(drink, "opsional minuman"));
+  }
 
   out.push("");
   out.push(
