@@ -54,7 +54,7 @@ export interface SnackCategory {
 
 /** Info global (yang sering ditanya) */
 export const ORDER_INFO = {
-  lokasiSingkat: "Gubug, Grobogan",
+  lokasiSingkat: "Godong, Grobogan",
   jamProduksi: "16.00 - 05.00 WIB",
   jamAdmin: "08.00 - 20.00 WIB",
   cutOffOrderBesar: "H-1 pukul 15.00 WIB",

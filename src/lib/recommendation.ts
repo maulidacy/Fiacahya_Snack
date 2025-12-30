@@ -6,6 +6,7 @@ import {
   type Tag,
 } from "@/data/paket-snack";
 import { FIACAHYA_PROFILE } from "@/config/fiacahya-data";
+import { getSnackBoxPool } from "@/data/snackbox-fillings";
 
 type Context = {
   intent: "recommend" | "other";
@@ -28,6 +29,8 @@ type Context = {
 
   taste?: "gurih" | "manis" | "campur";
   method?: "kukus" | "panggang" | "goreng" | "campur";
+  nonce?: string;
+  allowSpicy?: boolean;
   budget?: "hemat" | "standar" | "premium";
 };
 
@@ -39,6 +42,8 @@ export type RecommendSeed = {
   wantsDrink?: boolean;
   taste?: "gurih" | "manis" | "campur";
   method?: "kukus" | "panggang" | "goreng" | "campur";
+  nonce?: string;
+  allowSpicy?: boolean;
   budget?: "hemat" | "standar" | "premium";
 };
 
@@ -687,6 +692,8 @@ export function buildRecommendationReply(
     if (!ctx.taste && seed?.taste) ctx.taste = seed.taste;
     if (!ctx.method && seed?.method) ctx.method = seed.method;
     if (!ctx.budget && seed?.budget) ctx.budget = seed.budget;
+    if (seed?.nonce) ctx.nonce = seed.nonce;
+    if (seed?.allowSpicy !== undefined) ctx.allowSpicy = seed.allowSpicy;
   }
 
   if (ctx.intent !== "recommend" && !force) return null;
