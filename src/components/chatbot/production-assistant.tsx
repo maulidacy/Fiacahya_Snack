@@ -303,7 +303,7 @@ export function ProductionAssistant() {
                     Fiacahya Assistant
                   </p>
                   <p className="text-xs font-semibold">
-                    Bantuan produksi & estimasi paket
+                    Bantuan produksi & rekomendasi paket snack
                   </p>
                 </div>
                 <button
