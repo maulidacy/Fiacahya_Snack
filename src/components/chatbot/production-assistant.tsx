@@ -1,4 +1,3 @@
-// src/components/chatbot/production-assistant.tsx
 "use client";
 
 import type React from "react";
@@ -24,8 +23,6 @@ type RecommendSeed = {
   peopleCount?: number;
   itemCount?: 3 | 4;
   wantsDrink?: boolean;
-
-  // samakan nama field dengan backend
   taste?: "gurih" | "manis" | "campur";
   method?: "kukus" | "panggang" | "goreng" | "campur";
 };
@@ -49,12 +46,10 @@ function extractSeedUpdate(text: string): Partial<RecommendSeed> {
   else if (t.includes("hampers") || t.includes("parcel") || t.includes("hadiah")) occasion = "hampers";
   else if (t.includes("nikah") || t.includes("wedding") || t.includes("pernikahan")) occasion = "wedding";
 
-  // itemCount
   let itemCount: 3 | 4 | undefined;
   if (t.includes("isi 4") || t.includes("4 item") || t.includes("empat item")) itemCount = 4;
   if (t.includes("isi 3") || t.includes("3 item") || t.includes("tiga item")) itemCount = 3;
 
-  // wantsDrink
   const wantsDrink =
     t.includes("minum") ||
     t.includes("minuman") ||
@@ -62,13 +57,11 @@ function extractSeedUpdate(text: string): Partial<RecommendSeed> {
     t.includes("air putih") ||
     t.includes("teh");
 
-  // taste (gurih/manis/campur)
   let taste: RecommendSeed["taste"] | undefined;
   if (t.includes("gurih") || t.includes("asin")) taste = "gurih";
   else if (t.includes("manis")) taste = "manis";
   else if (t.includes("campur") || t.includes("mix")) taste = "campur";
 
-  // method (kukus/panggang/goreng)
   let method: RecommendSeed["method"] | undefined;
   if (t.includes("kukus")) method = "kukus";
   else if (t.includes("panggang") || t.includes("baked")) method = "panggang";
@@ -106,42 +99,21 @@ export function ProductionAssistant() {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const nextId = useRef(2);
 
-  // auto-scroll ke bawah setiap ada pesan baru / panel dibuka
   useEffect(() => {
     if (!listRef.current) return;
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, open, loading]);
 
-  // auto-resize textarea, tanpa scrollbar
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
-    const maxHeight = 120; // ~4–5 baris
+    const maxHeight = 120;
     el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
   }, [input]);
 
   function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
-  }
-
-  function extractSeed(text: string): RecommendSeed {
-    const t = text.toLowerCase();
-
-    const time =
-      t.includes("pagi") ? "pagi" :
-        t.includes("siang") ? "siang" :
-          t.includes("sore") ? "sore" :
-            t.includes("malam") ? "malam" : undefined;
-
-    let occasion: string | undefined;
-    if (t.includes("pengajian") || t.includes("arisan") || t.includes("tahlil")) occasion = "pengajian";
-    else if (t.includes("rapat") || t.includes("meeting") || t.includes("kantor")) occasion = "rapat";
-    else if (t.includes("ulang tahun") || t.includes("ultah")) occasion = "ulang-tahun";
-    else if (t.includes("hampers") || t.includes("parcel") || t.includes("hadiah")) occasion = "hampers";
-    else if (t.includes("nikah") || t.includes("wedding") || t.includes("pernikahan")) occasion = "wedding";
-
-    return { occasion, time };
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -157,44 +129,42 @@ export function ProductionAssistant() {
     const lower = trimmed.toLowerCase();
     const isRecommendRequest =
       lower.includes("rekomendasi") ||
-      lower.includes("rekomedasi") ||
-      lower.includes("rekomen") ||
       lower.includes("saran") ||
       lower.includes("bingung") ||
-      lower.includes("menu untuk") ||
-      lower.includes("cocok untuk") ||
-      lower.includes("bantu pilih") ||
-      lower.includes("isinya apa") ||
-      lower.includes("isi snack") ||
       lower.includes("snack box") ||
       lower.includes("gurih") ||
       lower.includes("asin") ||
-      lower.includes("manis") ||
-      lower.includes("kukus") ||
-      lower.includes("panggang") ||
-      lower.includes("goreng");
+      lower.includes("manis");
 
-    // hitung seed baru dulu (biar tidak ngirim state lama)
     const seedUpdate = extractSeedUpdate(trimmed);
     const nextSeed: RecommendSeed =
       mode === "recommend"
         ? { ...recSeed, ...seedUpdate }
         : isRecommendRequest
-          ? { ...seedUpdate } // start baru
+          ? { ...seedUpdate }
           : recSeed;
 
-    // mode yang DIKIRIM ke server
     const nextMode: "default" | "recommend" =
       mode === "recommend" ? "recommend" : isRecommendRequest ? "recommend" : "default";
 
-    // simpan seed untuk request ini
     setRecSeed(nextSeed);
 
     try {
+      // PERBAIKAN: Mengirim history agar AI tidak lupa konteks sebelumnya
+      const chatHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
       const res = await fetch("/api/fiacahya-assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed, mode: nextMode, seed: nextSeed }),
+        body: JSON.stringify({ 
+            message: trimmed, 
+            mode: nextMode, 
+            seed: nextSeed,
+            history: chatHistory // Logika Tambahan: History dikirim ke backend
+        }),
       });
 
       if (!res.ok) throw new Error("API error");
@@ -205,7 +175,6 @@ export function ProductionAssistant() {
       const replyText =
         data.reply ?? "Maaf, saya tidak menerima jawaban dari server. Coba lagi sebentar, ya.";
 
-      // kunci mode berdasarkan meta server (lebih akurat)
       const state = data.meta?.recommendState ?? "none";
       if (state === "ask") {
         setMode("recommend");
@@ -237,27 +206,14 @@ export function ProductionAssistant() {
 
   return (
     <>
-      {/* FLOATING TOGGLE BUTTON */}
       <button
         aria-label="Buka Asisten Produksi AI"
         onClick={() => { setOpen(true); setMode("default"); setRecSeed({}); }}
-        className="
-    fixed bottom-5 right-4 z-40
-          inline-flex items-center justify-center
-          h-12 w-12 md:h-[52px] md:w-[52px]
-          rounded-full bg-[#3E2A20] text-white
-          shadow-[0_18px_40px_rgba(0,0,0,0.35)]
-          hover:-translate-y-0.5 active:translate-y-0
-          transition-transform
-          md:bottom-6 md:right-6
-          dark:bg-[#F5E2C8] dark:text-[#3E2A20]
-  "
+        className="fixed bottom-5 right-4 z-40 inline-flex items-center justify-center h-12 w-12 md:h-[52px] md:w-[52px] rounded-full bg-[#3E2A20] text-white shadow-[0_18px_40px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 active:translate-y-0 transition-transform md:bottom-6 md:right-6 dark:bg-[#F5E2C8] dark:text-[#3E2A20]"
       >
         <Sparkles className="h-5 w-5" />
       </button>
 
-
-      {/* PANEL CHAT */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -266,7 +222,6 @@ export function ProductionAssistant() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {/* backdrop klik-tutup di mobile */}
             <div
               className="absolute inset-0 bg-black/20 sm:bg-transparent"
               onClick={() => setOpen(false)}
@@ -278,25 +233,10 @@ export function ProductionAssistant() {
               animate="visible"
               exit="exit"
               transition={{ duration: 0.18 }}
-              className="
-                relative z-10
-                mb-4 w-full max-w-md
-                rounded-3xl border
-                border-[#E1C09A]/80 bg-white
-                shadow-[0_22px_70px_rgba(15,23,42,0.25)]
-                overflow-hidden
-                sm:mr-4
-                dark:bg-[#050505]/98 dark:border-neutral-800
-              "
+              className="relative z-10 mb-4 w-full max-w-md rounded-3xl border border-[#E1C09A]/80 bg-white shadow-[0_22px_70px_rgba(15,23,42,0.25)] overflow-hidden sm:mr-4 dark:bg-[#050505]/98 dark:border-neutral-800"
             >
-              {/* HEADER */}
               <header
-                className="
-                  flex items-center justify-between gap-3
-                  px-4 py-3
-                  bg-gradient-to-r from-[#3D2618] to-[#5A3721]
-                  text-[#FDE8D5]
-                "
+                className="flex items-center justify-between gap-3 px-4 py-3 bg-gradient-to-r from-[#3D2618] to-[#5A3721] text-[#FDE8D5]"
               >
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.2em] text-[#F7D3A5]">
@@ -316,15 +256,9 @@ export function ProductionAssistant() {
                 </button>
               </header>
 
-              {/* AREA PESAN */}
               <div
                 ref={listRef}
-                className="
-                  max-h-[360px] min-h-[220px]
-                  overflow-y-auto px-3 py-3 space-y-3
-                  bg-white
-                  dark:bg-[#050505]
-                "
+                className="max-h-[360px] min-h-[220px] overflow-y-auto px-3 py-3 space-y-3 bg-white dark:bg-[#050505]"
               >
                 {messages.map((msg) => (
                   <div
@@ -333,28 +267,20 @@ export function ProductionAssistant() {
                       }`}
                   >
                     <div
-                      className={`
-    max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-line
-    ${msg.role === "user"
+                      className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-line ${msg.role === "user"
                           ? "bg-[#3E2A20] text-white border border-[#2A170F] dark:bg-[#F5E2C8] dark:text-[#2A170F] dark:border-[#E3C9A8]"
                           : "bg-[#FFF5EB] text-[#3A261A] border border-[#F2C89C]"
-                        }
-  `}
+                        }`}
                     >
                       {msg.content}
                     </div>
                   </div>
                 ))}
 
-                {/* TYPING INDICATOR */}
                 {loading && (
                   <div className="flex justify-start">
                     <div
-                      className="
-                        mt-1 inline-flex items-center gap-1
-                        rounded-2xl border border-[#F2C89C]
-                        bg-[#FFF5EB] px-3 py-2
-                      "
+                      className="mt-1 inline-flex items-center gap-1 rounded-2xl border border-[#F2C89C] bg-[#FFF5EB] px-3 py-2"
                     >
                       <span className="sr-only">
                         Fiacahya Assistant sedang mengetik
@@ -373,14 +299,9 @@ export function ProductionAssistant() {
                 )}
               </div>
 
-              {/* INPUT AREA */}
               <form
                 onSubmit={handleSubmit}
-                className="
-                  border-t border-[#E3C9A8]/80 bg-white px-3 py-2
-                  flex items-end gap-2
-                  dark:bg-[#050505]/95 dark:border-neutral-800
-                "
+                className="border-t border-[#E3C9A8]/80 bg-white px-3 py-2 flex items-end gap-2 dark:bg-[#050505]/95 dark:border-neutral-800"
               >
                 <textarea
                   ref={textareaRef}
@@ -388,14 +309,7 @@ export function ProductionAssistant() {
                   onChange={handleInputChange}
                   rows={1}
                   placeholder='Tulis pertanyaan, misalnya: “Estimasi kapasitas untuk 100 pax besok pagi?”'
-                  className="
-                    flex-1 rounded-2xl border border-[#E3C9A8]/80
-                    bg-white px-3 py-2 text-xs text-[#3A261A]
-                    focus:outline-none focus:ring-2 focus:ring-[#F4C58A]/80 focus:border-[#C48A4A]
-                    dark:bg-[#111111] dark:text-neutral-100 dark:border-neutral-700
-                    dark:focus:ring-amber-200/60 dark:focus:border-amber-300
-                    resize-none overflow-hidden
-                  "
+                  className="flex-1 rounded-2xl border border-[#E3C9A8]/80 bg-white px-3 py-2 text-xs text-[#3A261A] focus:outline-none focus:ring-2 focus:ring-[#F4C58A]/80 focus:border-[#C48A4A] dark:bg-[#111111] dark:text-neutral-100 dark:border-neutral-700 dark:focus:ring-amber-200/60 dark:focus:border-amber-300 resize-none overflow-hidden"
                   style={{ minHeight: "2.5rem", maxHeight: "7.5rem" }}
                 />
 
@@ -403,15 +317,7 @@ export function ProductionAssistant() {
                   type="submit"
                   disabled={!input.trim() || loading}
                   aria-label="Kirim"
-                  className="
-                    inline-flex h-9 w-9 items-center justify-center
-                    rounded-full bg-[#3E2A20] text-white
-                    shadow-[0_12px_30px_rgba(0,0,0,0.35)]
-                    disabled:opacity-40 disabled:shadow-none
-                    hover:-translate-y-0.5 active:translate-y-0
-                    transition-transform
-                    dark:bg-[#F5E2C8] dark:text-[#2A170F]
-                  "
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#3E2A20] text-white shadow-[0_12px_30px_rgba(0,0,0,0.35)] disabled:opacity-40 disabled:shadow-none hover:-translate-y-0.5 active:translate-y-0 transition-transform dark:bg-[#F5E2C8] dark:text-[#2A170F]"
                 >
                   {loading ? (
                     <span className="h-3 w-3 animate-spin rounded-full border-[2px] border-white/60 border-t-transparent" />
