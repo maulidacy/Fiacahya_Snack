@@ -184,7 +184,7 @@ const PRODUCT_DETAIL: Record<
     products: [
       {
         name: "Nastar Nanas",
-        price: "Rp50.000/500gr toples",
+        price: "Rp50.000/500gr",
         note: "Isian selai nanas homemade, lembut dan manis seimbang.",
       },
       {
@@ -199,17 +199,17 @@ const PRODUCT_DETAIL: Record<
       },
       {
         name: "Putri Salju",
-        price: "Rp50.000/500gr toples",
+        price: "Rp50.000/500gr",
         note: "Kue lembut lumer dengan taburan gula halus premium.",
       },
       {
         name: "Kastengel",
-        price: "Rp50.000/500gr toples",
+        price: "Rp50.000/500gr",
         note: "Keju melimpah, rasa gurih pekat, cocok untuk hampers premium.",
       },
       {
         name: "Lidah Kucing",
-        price: "Rp50.000/500gr toples",
+        price: "Rp50.000/500gr",
         note: "Kue tipis renyah dengan rasa mentega yang kaya.",
       },
       {
