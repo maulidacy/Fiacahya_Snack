@@ -184,37 +184,37 @@ const PRODUCT_DETAIL: Record<
     products: [
       {
         name: "Nastar Nanas",
-        price: "Rp45.000/500gr toples",
+        price: "Rp50.000/500gr toples",
         note: "Isian selai nanas homemade, lembut dan manis seimbang.",
       },
       {
         name: "Keciput",
-        price: "Rp35.000/250gr",
+        price: "Rp80.0000/1000gr",
         note: "Kue wijen renyah dengan rasa manis gurih khas tradisional.",
       },
       {
         name: "Unthuk Yuyu",
-        price: "Rp35.000/250gr",
+        price: "Rp80.0000/1000gr",
         note: "Kue tradisional kecil dengan tekstur renyah rasa manis gurih, terbuat dari tepung ketan.",
       },
       {
         name: "Putri Salju",
-        price: "Rp40.000/500gr toples",
+        price: "Rp50.000/500gr toples",
         note: "Kue lembut lumer dengan taburan gula halus premium.",
       },
       {
         name: "Kastengel",
-        price: "Rp45.000/500gr toples",
+        price: "Rp50.000/500gr toples",
         note: "Keju melimpah, rasa gurih pekat, cocok untuk hampers premium.",
       },
       {
         name: "Lidah Kucing",
-        price: "Rp45.000/500gr toples",
+        price: "Rp50.000/500gr toples",
         note: "Kue tipis renyah dengan rasa mentega yang kaya.",
       },
       {
         name: "Egg Roll",
-        price: "Rp60.000/500gr toples",
+        price: "Rp-",
         note: "Kue gulung tipis dengan tekstur renyah dan rasa manis gurih.",
       },
     ],
