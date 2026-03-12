@@ -26,6 +26,7 @@ const PRODUCT_DETAIL: Record<
   {
     title: string;
     intro: string;
+    noteBold?: string;
     products: Product[];
   }
 > = {
@@ -179,7 +180,9 @@ const PRODUCT_DETAIL: Record<
 
   "kue-kering": {
     title: "Kue Kering",
-    intro: "Sajikan hampers Lebaran yang istimewa dengan aneka kue kering pilihan. Cocok untuk hampers pribadi, parcel perusahaan, maupun pembelian grosir. Harga menyesuaikan ukuran toples dan jumlah varian. <b>Berat yang tertera sudah termasuk toples.</b>",
+    intro:
+      "Sajikan hampers Lebaran yang istimewa dengan aneka kue kering pilihan. Cocok untuk hampers pribadi, parcel perusahaan, maupun pembelian grosir. Harga menyesuaikan ukuran toples dan jumlah varian.",
+    noteBold: "Berat yang tertera sudah termasuk toples.",
     products: [
       {
         name: "Nastar Nanas",
@@ -222,59 +225,59 @@ const PRODUCT_DETAIL: Record<
   "kue-tart-cake": {
     title: "Tart Fresh Cream, Roti Isi & Aneka Bolu Panggang",
     intro:
-    "Rangkaian tart fresh cream dan bolu panggang premium yang dibuat fresh setiap hari. Ideal untuk ulang tahun, syukuran keluarga, acara kantor, hingga display coffee shop. Tersedia pilihan ukuran, dekor minimalis, dan custom tulisan.",
-  products: [
-    {
-      name: "Tart Oreo Fresh Cream Ø 16cm",
-      price: "Mulai Rp70.000",
-      note: "Dekor minimalis dengan fresh cream dan topping oreo.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765125272/20230101_122120_gl3vcl.jpg",
-    },
-    {
-      name: "Cake Potong Aneka Topping Ø 22cm",
-      price: "Mulai Rp60.000",
-      note: "Cocok untuk 16 orang, bisa custom topping.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765125285/20230226_093848_w4fqmi.jpg",
-    },
-    {
-      name: "Bolu Panggang Pisang Ø 20cm",
-      price: "Rp50.000/loyang",
-      note: "Bolu panggang pisang lembut dengan rasa manis.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765124678/20240730_122558_ljvi7j.jpg",
-    },
-    {
-      name: "Brownies Kukus",
-      price: "Mulai Rp35.000/loyang",
-      note: "Brownies kukus lembut dengan rasa cokelat pekat. Tersedia ukuran berbagai ukuran.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796243/20200319_122312-1-1_kl6kot.jpg",
-    },
-    {
-      name: "Bolu Panggang Vanila/Pandan Ø 20cm",
-      price: "Rp40.000/loyang",
-      note: "Bolu panggang vanila lembut dengan rasa manis.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796397/20240601_120359_GTZkQBpo1q_dcx09m.jpg",
-    },
-    {
-      name: "Roti Isi Selai Ø 9cm",
-      price: "Rp7.000/pcs",
-      note: "Roti isi selai lembut dengan rasa manis.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796397/Screenshot_2025-08-06_152752_2_mdco6x.jpg",
-    },
-    {
-      name: "Roti Isi Ø 20cm",
-      price: "Rp25.000/loyang",
-      note: "Roti isi lembut dengan rasa manis.",
-      image:
-        "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765126411/20240801_144346_tcxzku.jpg",
-    },
-  ],
-},
+      "Rangkaian tart fresh cream dan bolu panggang premium yang dibuat fresh setiap hari. Ideal untuk ulang tahun, syukuran keluarga, acara kantor, hingga display coffee shop. Tersedia pilihan ukuran, dekor minimalis, dan custom tulisan.",
+    products: [
+      {
+        name: "Tart Oreo Fresh Cream Ø 16cm",
+        price: "Mulai Rp70.000",
+        note: "Dekor minimalis dengan fresh cream dan topping oreo.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765125272/20230101_122120_gl3vcl.jpg",
+      },
+      {
+        name: "Cake Potong Aneka Topping Ø 22cm",
+        price: "Mulai Rp60.000",
+        note: "Cocok untuk 16 orang, bisa custom topping.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765125285/20230226_093848_w4fqmi.jpg",
+      },
+      {
+        name: "Bolu Panggang Pisang Ø 20cm",
+        price: "Rp50.000/loyang",
+        note: "Bolu panggang pisang lembut dengan rasa manis.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765124678/20240730_122558_ljvi7j.jpg",
+      },
+      {
+        name: "Brownies Kukus",
+        price: "Mulai Rp35.000/loyang",
+        note: "Brownies kukus lembut dengan rasa cokelat pekat. Tersedia ukuran berbagai ukuran.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796243/20200319_122312-1-1_kl6kot.jpg",
+      },
+      {
+        name: "Bolu Panggang Vanila/Pandan Ø 20cm",
+        price: "Rp40.000/loyang",
+        note: "Bolu panggang vanila lembut dengan rasa manis.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796397/20240601_120359_GTZkQBpo1q_dcx09m.jpg",
+      },
+      {
+        name: "Roti Isi Selai Ø 9cm",
+        price: "Rp7.000/pcs",
+        note: "Roti isi selai lembut dengan rasa manis.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796397/Screenshot_2025-08-06_152752_2_mdco6x.jpg",
+      },
+      {
+        name: "Roti Isi Ø 20cm",
+        price: "Rp25.000/loyang",
+        note: "Roti isi lembut dengan rasa manis.",
+        image:
+          "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765126411/20240801_144346_tcxzku.jpg",
+      },
+    ],
+  },
 
   "snack-box-paket": {
     title: "Snack Box & Paket Acara",
@@ -367,7 +370,7 @@ export default async function ProdukDetailPage({
             {data.title}
           </h1>
           <p className="text-sm md:text-base text-[#6A4A35] dark:text-neutral-200 leading-relaxed mb-6">
-            {data.intro}
+            {data.intro} <strong>{data.noteBold}</strong>
           </p>
 
           {isPaketPage ? <PaketDetailList data={data} /> : <ProdukGrid data={data} />}
