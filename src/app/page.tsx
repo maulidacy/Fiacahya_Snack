@@ -54,19 +54,19 @@ type Testimonial = {
 
 const testimonials: Testimonial[] = [
   {
-    name: "Nadia - Corporate Catering",
+    name: "Pelanggan Tetap Fiacahya Snack",
     text: "Snack box Fiacahya selalu fresh dan rapi. Klien kami berkali-kali minta repeat order.",
     image:
       "https://i.pinimg.com/736x/9b/47/50/9b475077d9f9f7713b401cc7380b8733.jpg",
   },
   {
-    name: "Rama - Event Organizer",
+    name: "Pelanggan Sekitar Gubug",
     text: "Rasanya premium, packaging elegan. Sangat membantu untuk acara formal dan wedding.",
     image:
       "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796396/IMG_20230414_150505_159_zefciv.jpg",
   },
   {
-    name: "Dina - Coffee Shop Owner",
+    name: "Pelanggan Sekitar Produksi",
     text: "Cocok banget jadi pairing kopi. Stock selalu konsisten dan tepat waktu.",
     image:
       "https://res.cloudinary.com/dxdb3dj8f/image/upload/v1765796407/Kroket_jkknpg.jpg",
