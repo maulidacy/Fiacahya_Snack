@@ -179,8 +179,7 @@ const PRODUCT_DETAIL: Record<
 
   "kue-kering": {
     title: "Kue Kering",
-    intro:
-      "Kue kering untuk hampers lebaran, parcel perusahaan, dan penjualan grosir. Harga menyesuaikan ukuran toples dan jumlah varian.",
+    intro: "Sajikan hampers Lebaran yang istimewa dengan aneka kue kering pilihan. Cocok untuk hampers pribadi, parcel perusahaan, maupun pembelian grosir. Harga menyesuaikan ukuran toples dan jumlah varian. <b>Berat yang tertera sudah termasuk toples.</b>",
     products: [
       {
         name: "Nastar Nanas",
@@ -189,12 +188,12 @@ const PRODUCT_DETAIL: Record<
       },
       {
         name: "Keciput",
-        price: "Rp80.0000/1000gr",
+        price: "Rp80.000/1000gr",
         note: "Kue wijen renyah dengan rasa manis gurih khas tradisional.",
       },
       {
         name: "Unthuk Yuyu",
-        price: "Rp80.0000/1000gr",
+        price: "Rp80.000/1000gr",
         note: "Kue tradisional kecil dengan tekstur renyah rasa manis gurih, terbuat dari tepung ketan.",
       },
       {
